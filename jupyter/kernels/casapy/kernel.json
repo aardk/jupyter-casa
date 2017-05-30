@@ -1,0 +1,7 @@
+{
+   "argv": ["python", "-m", "casapy",
+               "-f", "{connection_file}"],
+   "mimetype": "text/plain",
+   "display_name": "Casa",
+   "language": "casa"
+}

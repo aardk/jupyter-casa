@@ -4,7 +4,7 @@ A [Jupyter](http://jupyter.org/) kernel for [CASA](https://casa.nrao.edu/)
 ## Introduction
 
 Jupyter is a web-based application which allows users to create interactive notebooks which can 
-include annotated text and graphics as well as executable code. The notebook format also has the great advantage that all 
+include annotated text and graphics as well as executable code. The notebook format has the great advantage that all 
 steps of the data reduction are preserved inside the notebook. This means that the whole data reduction process is 
 self-documenting and fully repeatable. It also allows users to very easily make changes to their pipeline and then rerun 
 the pipeline steps affected.
@@ -16,19 +16,23 @@ spawn a GUI window are wrapped so that their output is saved to an image instead
 
 ## Installation
 
-Because Jupyter requires a much more current python distibution than what is used in NRAO's CASA releases, a custom build
+Because Jupyter requires a much more current python distibution than what is provided in NRAO's CASA releases, a custom build
 of CASA is required. We distribute a [DOCKER](https://www.docker.com/) image containing a version of CASA which uses the
 most recent (I)python, matplotlib, etc. Note that this version of CASA can only be used from within Jupyter.
 
+Installation is a simple as executing:
+`
 docker pull penngwyn/jupytercasa
+`
 
 ## Usage
 
-Eventhough we wrap all CASA tasks so that they will not launch a GUI window the QT based CASA tasks still require X11, unfortunately.
-Tasks such as *plotms* won't start unless X11 is working even when it doesn't even open a window!
+Even though we wrap all CASA tasks so that they will not launch a GUI window the QT based CASA tasks still require X11, unfortunately.
+Tasks such as *plotms* won't start unless X11 is working even when it doesn't even open a window.
 Therefore the local X11 socket needs to be shared with Docker container.
 
 The simplest incantation to start JUPYTER on a recent Ubuntu:
+
 `
 docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
 `
@@ -36,7 +40,8 @@ docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$
 Note that the `'--rm'` option will make DOCKER delete the container after use.
 
 Of course the above example is not very usefull as the container will not be able to access locally stored *measurement sets*.
-To add a data directory to the DOCKER container is, fortunately, very simple:
+To add a data directory to the DOCKER container is, fortunately, very simple using the `-v` option:
+
 `
 docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
 `
@@ -45,6 +50,7 @@ Where `PATH_TO_DATA_DIR` should be replaced with the full path to your local dat
 
 The above examples use a JUPYTER kernel which is baked into the DOCKER image. It is also possible to use the GITHUB development version
 within the CASA container, from the root of the source tree run:
+
 `
 docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v $PWD/jupyter:/home/jupyter/.local/share/jupyter -v $PWD/python/casapy:/home/jupyter/.local/lib/python2.7/site-packages/casapy -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
 ` 

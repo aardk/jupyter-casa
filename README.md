@@ -14,3 +14,44 @@ Jupyter kernel for CASA, a widely-used software package for processing astronomi
 The kernel allows all CASA tasks to be run from inside a Jupyter notebook, albeit non-interactively. Tasks which normally 
 spawn a GUI window are wrapped so that their output is saved to an image instead, which is then displayed inside the notebook.
 
+## Installation
+
+Because Jupyter requires a much more current python distibution than what is used in NRAO's CASA releases, a custom build
+of CASA is required. We distribute a [DOCKER](https://www.docker.com/) image containing a version of CASA which uses the
+most recent (I)python, matplotlib, etc. Note that this version of CASA can only be used from within Jupyter.
+
+docker pull penngwyn/jupytercasa
+
+## Usage
+
+Eventhough we wrap all CASA tasks so that they will not launch a GUI window the QT based CASA tasks still require X11, unfortunately.
+Tasks such as *plotms* won't start unless X11 is working even when it doesn't even open a window!
+Therefore the local X11 socket needs to be shared with Docker container.
+
+The simplest incantation to start JUPYTER on a recent Ubuntu:
+`
+docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
+`
+
+Note that the `'--rm'` option will make DOCKER delete the container after use.
+
+Of course the above example is not very usefull as the container will not be able to access locally stored *measurement sets*.
+To add a data directory to the DOCKER container is, fortunately, very simple:
+`
+docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
+`
+
+Where `PATH_TO_DATA_DIR` should be replaced with the full path to your local data directory.
+
+The above examples use a JUPYTER kernel which is baked into the DOCKER image. It is also possible to use the GITHUB development version
+within the CASA container, from the root of the source tree run:
+`
+docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v $PWD/jupyter:/home/jupyter/.local/share/jupyter -v $PWD/python/casapy:/home/jupyter/.local/lib/python2.7/site-packages/casapy -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
+` 
+
+## Examples
+
+In the *examples* directory there is a notebook which contains the NRAO continuum VLA tutorial. To run that code locally
+be sure to download the data files from the [NRAO wiki](https://casaguides.nrao.edu/index.php/VLA_Continuum_Tutorial_3C391-CASA4.7).
+
+Also don't forget to make the directory available to the DOCKER container using the `-v` option as is explained above.

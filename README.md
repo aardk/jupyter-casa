@@ -27,7 +27,7 @@ docker pull penngwyn/jupytercasa
 
 ## Usage
 
-Even though we wrap all CASA tasks so that they will not launch a GUI window the QT based CASA tasks still require X11, unfortunately.
+Even though we wrap all CASA tasks so that they will not launch a GUI window, the QT based CASA tasks still require X11, unfortunately.
 Tasks such as *plotms* won't start unless X11 is working even when it doesn't even open a window.
 Therefore the local X11 socket needs to be shared with Docker container.
 

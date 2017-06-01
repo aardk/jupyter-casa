@@ -35,7 +35,11 @@ ENV PYTHONPATH="/home/jupyter/.local/lib/python2.7/site-packages/:/usr/local/lib
     QT_X11_NO_MITSHM=1
 RUN mkdir -p /home/jupyter/.jupyter \
     && mkdir -p /home/jupyter/.local/lib/python2.7/site-packages \
-    && mkdir -p /home/jupyter/.local/share 
+    && mkdir -p /home/jupyter/.local/share/jupyter/kernels/casapy \
+    && mkdir -p /home/jupyter/.local/share/jupyter/runtime \
+    && mkdir -p /home/jupyter/.local/share/jupyter/nbextensions
+ADD casapy.tar.gz /home/jupyter/.local/lib/python2.7/site-packages/
+COPY kernel.json /home/jupyter/.local/share/jupyter/kernels/casapy
 COPY jupyter_notebook_config.py /home/jupyter/.jupyter
 COPY create_font_cache.py /home/jupyter/
 RUN python create_font_cache.py 

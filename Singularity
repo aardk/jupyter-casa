@@ -1,6 +1,5 @@
-BootStrap: debootstrap
-OSVersion: xenial
-MirrorURL: http://nl.archive.ubuntu.com/ubuntu/
+Bootstrap: docker
+From: ubuntu:16.04
 
 %runscript
     echo "Starting Jupyter"

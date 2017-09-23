@@ -1,5 +1,5 @@
-Bootstrap: docker
-From: ubuntu:16.04
+BootStrap: docker
+From:  ubuntu:xenial-20161213
 
 %runscript
     echo "Starting Jupyter"

@@ -25,8 +25,32 @@ Installation is a simple as executing:
 docker pull penngwyn/jupytercasa
 `
 
-## Usage
+Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which a bit easier use, it can be downloaded by executing:
 
+`
+singularity pull shub://aardk/jupyter-casa
+`
+
+## Usage
+### Singularity
+The simplest way to start the Jupyter server is to execute:
+
+`
+singularity run aardk-jupyter-casa-master.img
+`
+
+Unlike DOCKER, a SINGULARITY containter runs with UID of the current user (i.e. the user executing `singularity run`).
+The home directory as it exists on the local filesystem will also be present inside the container, but by default
+only the home directory is shared with the container. 
+
+Fortunately, it is fairly straigthforward to make your local filesystem accessible to the container using the *-B* option.
+For example to mount a directory called */data* inside the container execute:
+
+`
+singularity run -B /data:$HOME/data aardk-jupyter-casa-master.img
+`
+
+### Docker
 Even though we wrap all CASA tasks so that they will not launch a GUI window, the QT based CASA tasks still require X11, unfortunately.
 Tasks such as *plotms* won't start unless X11 is working even when it doesn't even open a window.
 Therefore the local X11 socket needs to be shared with Docker container.

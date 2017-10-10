@@ -25,7 +25,7 @@ Installation is a simple as executing:
 docker pull penngwyn/jupytercasa
 `
 
-Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which a bit easier use, it can be downloaded by executing:
+Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which may be a bit easier use, it can be downloaded by executing:
 
 `
 singularity pull shub://aardk/jupyter-casa
@@ -40,8 +40,9 @@ singularity run aardk-jupyter-casa-master.img
 `
 
 Unlike DOCKER, a SINGULARITY containter runs with UID of the current user (i.e. the user executing `singularity run`).
-The home directory as it exists on the local filesystem will also be present inside the container, but by default
-only the home directory is shared with the container. 
+The home directory of the user on the local filesystem will also be accessible inside the container, but by default
+only the home directory is shared with the container. Therefore any symbolic links which point to locations outside of the
+home directory will not be valid inside the container.
 
 Fortunately, it is fairly straigthforward to make your local filesystem accessible to the container using the *-B* option.
 For example to mount a directory called */data* inside the container execute:

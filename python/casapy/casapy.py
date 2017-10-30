@@ -1574,7 +1574,17 @@ class CasapyKernel(IPythonKernel):
         # Display log messages
         if len(loglines) > 0:
             button_id = str(time.time()).replace('.', '_') # Make sure all IDs are unique
-            html_code = '<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#log' + button_id + \
-                   '">Show log</button> <div id="log' + button_id + '" class="collapse">' + "<br>".join(loglines) + '</div>'
+            errorhappened = any(['Some arguments failed to verify' in logline
+                                   for logline in loglines]) or \
+                            any(['Please check that the file ' in logline
+                                   for logline in loglines])
+            if errorhappened:
+                errorcolor = ' style="background-color:red"'
+                errorin = ' in'
+            else:
+                errorcolor = ''
+                errorin = ''
+            html_code = '<button type="button" ' + errorcolor + 'class="btn btn-info" data-toggle="collapse" data-target="#log' + button_id + \
+                   '">Show log</button> <div class="collapse' + errorin + '" id="log' + button_id + '">' + "<br>".join(loglines) + '</div>'
             IPython.display.display_html(html_code, raw=True)
         return result

@@ -28,7 +28,7 @@ docker pull penngwyn/jupytercasa
 Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which may be a bit easier to use, it can be downloaded by executing:
 
 `
-singularity pull shub://aardk/jupyter-casa
+singularity pull --name jupyter-casa.simg shub://aardk/jupyter-casa
 `
 
 ## Usage
@@ -36,7 +36,7 @@ singularity pull shub://aardk/jupyter-casa
 The simplest way to start the Jupyter server is to execute:
 
 `
-singularity run aardk-jupyter-casa-master.img
+singularity run aardk-jupyter-casa.simg
 `
 
 Unlike DOCKER, a SINGULARITY containter runs with UID of the current user (i.e. the user executing `singularity run`).
@@ -48,7 +48,7 @@ Fortunately, it is fairly straigthforward to make your local filesystem accessib
 For example to mount a directory called */data* inside the container execute:
 
 `
-singularity run -B /data:$HOME/data aardk-jupyter-casa-master.img
+singularity run -B /data:$HOME/data aardk-jupyter-casa.simg
 `
 
 ### Docker

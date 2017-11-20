@@ -20,12 +20,12 @@ Because Jupyter requires a much more current python distibution than what is pro
 of CASA is required. We distribute a [DOCKER](https://www.docker.com/) image containing a version of CASA which uses the
 most recent (I)python, matplotlib, etc. Note that this version of CASA can only be used from within Jupyter.
 
-Installation is a simple as executing:
+Installation is as simple as executing:
 `
 docker pull penngwyn/jupytercasa
 `
 
-Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which may be a bit easier use, it can be downloaded by executing:
+Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which may be a bit easier to use, it can be downloaded by executing:
 
 `
 singularity pull shub://aardk/jupyter-casa
@@ -64,7 +64,7 @@ docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$
 
 Note that the `'--rm'` option will make DOCKER delete the container after use.
 
-Of course the above example is not very usefull as the container will not be able to access locally stored *measurement sets*.
+Of course the above example is not very useful as the container will not be able to access locally stored *measurement sets*.
 To add a data directory to the DOCKER container is, fortunately, very simple using the `-v` option:
 
 `

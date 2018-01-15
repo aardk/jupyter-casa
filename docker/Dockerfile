@@ -100,6 +100,7 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf casa-asap \
+    && rm -rf code \
     && rm -rf .git
 
 # Install jupyter casa wrapper and copy fixed casa tasked

@@ -83,6 +83,6 @@ docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$
 ## Examples
 
 In the *examples* directory there is a notebook which contains the NRAO continuum VLA tutorial. To run that code locally
-be sure to download the data files from the [NRAO wiki](https://casaguides.nrao.edu/index.php/VLA_Continuum_Tutorial_3C391-CASA4.7).
+be sure to download the data files from the [NRAO wiki](https://casaguides.nrao.edu/index.php?title=VLA_Continuum_Tutorial_3C391).
 
 Also don't forget to make the directory available to the DOCKER container using the `-v` option as is explained above.

@@ -8,6 +8,11 @@ import signal
 from ipykernel.ipkernel import IPythonKernel
 
 ##
+## toplevel frame marker
+##
+_casa_top_frame_ = True
+
+##
 ## ensure that we're the process group leader
 ## of all processes that we fork...
 ##
@@ -75,7 +80,6 @@ except ImportError, e:
     print "failed to load matplotlib:\n", e
     print "sys.path =", "\n\t".join(sys.path)
     
-from asap_init import *
 
 
 homedir = os.getenv('HOME')
@@ -84,10 +88,12 @@ if homedir == None :
    sys.exit(1)
 
 import casadef
+import __casac__
+cu = __casac__.utils.utils()
 
 casa = { 'build': {
              'time': casadef.build_time,
-             'version': casadef.casa_version,
+             'version': cu.version_info( ),
              'number': casadef.subversion_revision
          },
          'source': {
@@ -103,7 +109,7 @@ casa = { 'build': {
              'ipcontroller': None,
              'ipengine': None
          },
-         'dirs': {
+        'dirs': {
              'rc': homedir + '/.casa',
              'data': None,
              'recipes': None,
@@ -113,10 +119,11 @@ casa = { 'build': {
              'xml': None
          },
          'flags': { },
-         'files': { 
+         'files': {
              'logfile': os.getcwd( ) + '/casa-'+time.strftime("%Y%m%d-%H%M%S", time.gmtime())+'.log'
          },
          'state' : {
+             'init_version': 0,
              'startup': True,
              'unwritable': set( )
          }
@@ -135,8 +142,8 @@ if os.environ.has_key('CASAPATH') :
     else :
         casa['dirs']['root'] = __casapath__
         casa['dirs']['data'] = __casapath__ + "/data"
-        if os.path.exists(__casapath__ + "/" + __casaarch__ + "/python/2.7/assignmentFilter.py"):
-            casa['dirs']['python'] = __casapath__ + "/" + __casaarch__ + "/python/2.7"
+        if os.path.exists(__casapath__ + "/" + __casaarch__ + "/lib/python2.7/assignmentFilter.py"):
+            casa['dirs']['python'] = __casapath__ + "/" + __casaarch__ + "/lib/python2.7"
         elif os.path.exists(__casapath__ + "/lib/python2.7/assignmentFilter.py"):
             casa['dirs']['python'] = __casapath__ + "/lib/python2.7"
         elif os.path.exists(__casapath__ + "/Resources/python/assignmentFilter.py"):
@@ -162,8 +169,8 @@ else :
     else :
         casa['dirs']['root'] = __casapath__
         casa['dirs']['data'] = __casapath__ + "/data"
-        if os.path.exists(__casapath__ + "/" + __casaarch__ + "python/2.7/assignmentFilter.py"):
-            casa['dirs']['python'] = __casapath__ + "/" + __casaarch__ + "/python/2.7"
+        if os.path.exists(__casapath__ + "/" + __casaarch__ + "/lib/python2.7/assignmentFilter.py"):
+            casa['dirs']['python'] = __casapath__ + "/" + __casaarch__ + "/lib/python2.7"
         elif os.path.exists(__casapath__ + "/lib/python2.7/assignmentFilter.py"):
             casa['dirs']['python'] = __casapath__ + "/lib/python2.7"
         elif os.path.exists(__casapath__ + "/Resources/python/assignmentFilter.py"):
@@ -1239,7 +1246,7 @@ def pybot_install( ):
         print "OUTPUT: ", output
         print "ERROR:  ", err
 
-    install = subprocess.Popen( "python setup.py install --install-lib=%s/python/2.7 --install-scripts=%s/bin" % (archdir,archdir), \
+    install = subprocess.Popen( "python setup.py install --install-lib=%s/python2.7 --install-scripts=%s/bin" % (archdir,archdir), \
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, cwd=tmp )
     (output, err) = install.communicate()
     if len(err) > 0:
@@ -1303,6 +1310,7 @@ from task_help import *
 #
 import publish_summary
 import runUnitTest
+import runRegressionTest
 #
 home=os.environ['HOME']
 
@@ -1457,16 +1465,6 @@ except:
 casalog.showconsole(showconsole)
 casalog.version()
 
-
-### Try loading ASAP
-try:
-    asap_init()
-except ImportError, e:
-    casalog.post("%s\nCould not load ASAP. sd* tasks will not be available." % e,'WARN')
-except Exception, instance:
-    casalog.post("Could not load ASAP. sd* tasks will not be available.",'WARN')
-    casalog.post(str(instance),'WARN',origin="asap_init")
-##
 ## warn when available memory is < 512M (clean throws and exception)
 if cu.hostinfo( )['memory']['available'] < 524288:
     casalog.post( 'available memory less than 512MB (with casarc settings)\n...some things will not run correctly', 'SEVERE' )

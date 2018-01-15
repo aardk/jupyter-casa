@@ -136,6 +136,7 @@ from hanningsmooth import  hanningsmooth
 from imcollapse import  imcollapse
 from imcontsub import  imcontsub
 from imfit import  imfit
+from imdev import  imdev
 from imhead import  imhead
 from imhistory import  imhistory
 from immath import  immath
@@ -170,7 +171,7 @@ listobs = wrap_listfile(listobs)
 from listpartition import  listpartition
 from listsdm import  listsdm
 from listvis import  listvis
-from makemask import  makemask
+from makemask_cli import  makemask_cli as makemask
 from mosaic import  mosaic
 from msview import  msview
 from mstransform import  mstransform
@@ -189,9 +190,16 @@ from partition import  partition
 from polcal import  polcal
 from predictcomp import  predictcomp
 from impv import  impv
+from rerefant import  rerefant
 from rmfit import  rmfit
 from rmtables import  rmtables
+from sdbaseline import  sdbaseline
+from sdcal import  sdcal
+from sdfit import  sdfit
+from sdfixscan import  sdfixscan
 from sdgaincal import  sdgaincal
+from sdimaging import  sdimaging
+from sdsmooth import  sdsmooth
 from setjy import  setjy
 from ssoflux import  ssoflux
 from simalma import  simalma
@@ -206,13 +214,10 @@ from splattotable import  splattotable
 from split import  split
 from spxfit import  spxfit
 from statwt import  statwt
+from statwt2 import  statwt2
 from tclean import  tclean
 from tclean2 import  tclean2
 from testconcat import  testconcat
-from tsdbaseline import  tsdbaseline
-from tsdcal import  tsdcal
-from tsdfit import  tsdfit
-from tsdsmooth import  tsdsmooth
 from uvcontsub import  uvcontsub
 from uvcontsub3 import  uvcontsub3
 from uvmodelfit import  uvmodelfit
@@ -222,6 +227,7 @@ viewer = wrap_viewer(viewer)
 from wvrgcal import  wvrgcal
 from virtualconcat import  virtualconcat
 from vishead import  vishead
+from visstatold import  visstatold
 from visstat import  visstat
 from visstat2 import  visstat2
 from widebandpbcor import  widebandpbcor

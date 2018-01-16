@@ -66,7 +66,10 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && git clone --no-checkout https://open-bitbucket.nrao.edu/scm/casa/casa-data.git $workDir/data \
     && cd data \
     && git show HEAD:distro | bash \
+    # cleanup git, saves ~600MB
     && rm -rf .git \
+
+    # Build casacore
     && mkdir $workDir/casacore/build \
     && cd $workDir/casacore/build \
     && cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DUseCasacoreNamespace=1 2>&1 \
@@ -74,10 +77,13 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make install \
     && cd $workDir \
     && rm -rf casacore \
+
+    # build casa code
     && mkdir $workDir/code/build \
     && cd $workDir/code/build \
     && mkdir gtest breakpad \
     && cd gtest \
+    # For some reason automatic download of googletest and breakpad fails on my system
     && wget https://svn.cv.nrao.edu/casa/devel/googletest/googletest-release-1.7.0.tar.gz \
     && tar zxvf googletest-release-1.7.0.tar.gz \
     && cd ../breakpad \
@@ -88,12 +94,16 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf code/build \ 
+
+    # build gcwrap
     && mkdir $workDir/gcwrap/build \
     && cd $workDir/gcwrap/build \
     && cmake .. -Darch=$CASA_ARCH -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DPYTHON_LIBNAME=2.7 -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DINTERACTIVE_ITERATION=1 2>&1 \
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf gcWrap \
+
+    # Build asap
     && mkdir $workDir/casa-asap/build \
     && cd $workDir/casa-asap/build \
     && cmake .. -Darch=$CASA_ARCH -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DPYTHON_LIBNAME=2.7 -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE 2>&1 \

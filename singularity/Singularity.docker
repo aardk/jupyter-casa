@@ -1,0 +1,13 @@
+# Singularity bootstrap based on the jupyter-casa docker. 
+# We use this on singularity hub, because it currently
+# doesn't have enough resources to build casa.
+Bootstrap: docker
+From: penngwyn/jupytercasa-for-singularity
+IncludeCmd: no
+
+%runscript
+    echo "Starting Jupyter"
+    jupyter notebook
+
+%environment
+  unset XDG_RUNTIME_DIR 

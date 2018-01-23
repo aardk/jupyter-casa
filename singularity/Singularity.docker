@@ -7,6 +7,7 @@ IncludeCmd: no
 
 %runscript
     echo "Starting Jupyter"
+    cd $HOME
     jupyter notebook
 
 %environment

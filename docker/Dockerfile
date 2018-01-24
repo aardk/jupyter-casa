@@ -131,6 +131,6 @@ ENV PYTHONPATH="/usr/local/lib/python2.7/dist-packages:/usr/local/casa/linux64/l
     PATH="/usr/local/casa/linux64/bin:$PATH" \
     QT_X11_NO_MITSHM=1
 RUN mkdir -p /home/jupyter/.jupyter
-COPY docker/jupyter_notebook_config.py /home/jupyter/.jupyter
-COPY docker/create_font_cache.py /home/jupyter
+COPY --chown=jupyter:jupyter docker/jupyter_notebook_config.py /home/jupyter/.jupyter
+COPY --chown=jupyter:jupyter docker/create_font_cache.py /home/jupyter
 RUN python create_font_cache.py

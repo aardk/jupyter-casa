@@ -1579,11 +1579,13 @@ class CasapyKernel(IPythonKernel):
             if errorhappened:
                 errorcolor = ' style="background-color:red"'
                 errorin = ' in'
+                buttontext = 'Hide log'
             else:
                 errorcolor = ''
                 errorin = ''
+                buttontext = 'Show log'
             html_code = '<button type="button" ' + errorcolor + 'class="btn btn-info" data-toggle="collapse" id="' + button_id + '" data-target="#log' + button_id + '" ' +\
                    'onclick="if ($(\'#\'+this.id).html()==\'Show log\') {$(\'#\'+this.id).html(\'Hide log\')} else {$(\'#\'+this.id).html(\'Show log\')}; return false"' + \
-                   '>Show log</button> <div class="collapse' + errorin + '" id="log' + button_id + '">' + "<br>".join(loglines) + '</div>'
+                   '>' + buttontext + '</button> <div class="collapse' + errorin + '" id="log' + button_id + '">' + "<br>".join(loglines) + '</div>'
             IPython.display.display_html(html_code, raw=True)
         return result

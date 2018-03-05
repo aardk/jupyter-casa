@@ -121,6 +121,9 @@ COPY python/casa/TablePlotTkAgg.py $workDir/linux64/lib/python2.7
 COPY python/casa/task_setjy.py $workDir/linux64/lib/python2.7 
 COPY python/casa/casa_stack_manip.py $workDir/linux64/lib/python2.7 
 
+# Enable ipywidgets
+RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
+
 RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter
 EXPOSE 8888
 USER jupyter

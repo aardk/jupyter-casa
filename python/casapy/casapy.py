@@ -12,6 +12,15 @@ from ipykernel.ipkernel import IPythonKernel
 ##
 _casa_top_frame_ = True
 
+## this is filled via register_builtin (from casa_builtin.py)
+##
+casa_builtins = { }
+
+##
+## this is filled via add_shutdown_hook (from casa_shutdown.py)
+##
+casa_shutdown_handlers = [ ]
+
 ##
 ## ensure that we're the process group leader
 ## of all processes that we fork...
@@ -399,7 +408,8 @@ if casa['helpers']['dbus'] is not None :
 ipythonenv  = casa['dirs']['rc'] + '/ipython'
 ipythonpath = casa['dirs']['rc'] + '/ipython'
 try :
-   os.makedirs(ipythonpath, 0755)
+    print 'ipythonpath =', ipythonpath
+    os.makedirs(ipythonpath, 0755)
 except :
    pass
 ###check IPYTHONDIR is defined by user and make it if not there

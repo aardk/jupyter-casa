@@ -28,7 +28,9 @@ def stack_find(symbol, level='stack') :
 
     elif level == "root":
         for k in range(len(a)):
-            if string.find(a[k][1],"start_casa.py") > 0:
+            # aardk: in jupyter-casa there is no start_casa.py
+            #if string.find(a[k][1],"start_casa.py") > 0:
+            if string.find(a[k][1],"/casapy.py") > 0:
                 stacklevel=k
                 # jagonzal: Take the first level that matches the requirement
                 break
@@ -63,7 +65,9 @@ def stack_frame_find(level='stack') :
                     break
     elif level == "root":
         for k in range(len(a)):
-            if string.find(a[k][1],"start_casa.py") > 0:
+            # aardk: in jupyter-casa there is no start_casa.py
+            #if string.find(a[k][1],"start_casa.py") > 0:
+            if string.find(a[k][1],"/casapy.py") > 0:
                 stacklevel=k
                 # jagonzal: Take the first level that matches the requirement
                 break

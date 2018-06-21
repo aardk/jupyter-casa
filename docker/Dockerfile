@@ -54,7 +54,7 @@ RUN wget https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-lin
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \
     CASA_ARCH=linux64 \
-    CASA_BRANCH=release/5.1.2 \
+    CASA_BRANCH=release/5.3.0 \
     workDir=/usr/local/casa \
     CASAPATH="$workDir $CASA_ARCH"
 
@@ -68,7 +68,6 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && git show HEAD:distro | bash \
     # cleanup git, saves ~600MB
     && rm -rf .git \
-
     # Build casacore
     && mkdir $workDir/casacore/build \
     && cd $workDir/casacore/build \
@@ -77,7 +76,6 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make install \
     && cd $workDir \
     && rm -rf casacore \
-
     # build casa code
     && mkdir $workDir/code/build \
     && cd $workDir/code/build \
@@ -94,7 +92,6 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf code/build \ 
-
     # build gcwrap
     && mkdir $workDir/gcwrap/build \
     && cd $workDir/gcwrap/build \
@@ -102,7 +99,6 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf gcWrap \
-
     # Build asap
     && mkdir $workDir/casa-asap/build \
     && cd $workDir/casa-asap/build \

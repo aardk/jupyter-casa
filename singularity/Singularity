@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: ubuntu:16.04
+From: ubuntu:18.04
 IncludeCmd: no
 
 %runscript
@@ -14,28 +14,36 @@ IncludeCmd: no
   export QT_X11_NO_MITSHM=1
   unset XDG_RUNTIME_DIR 
 
+%setup
+  # Get timezone information from host
+  date +%Z > ${SINGULARITY_ROOTFS}/etc/timezone
+
 %post
     # Setup enviroment
-    echo deb http://nl.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse >/etc/apt/sources.list
-    echo deb http://nl.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse >>/etc/apt/sources.list
+    echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic main restricted universe multiverse >/etc/apt/sources.list
+    echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic-updates main restricted universe multiverse >>/etc/apt/sources.list
 
     export LC_ALL=C
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y
     apt-get install -y python2.7 python-dev python-numpy python-matplotlib python-scipy python-pip python-nose python-dbus\
-                       build-essential git wget cmake flex bison g++ xvfb
-    apt-get install -y libcfitsio-dev libreadline6-dev libncurses5-dev libhdf5-serial-dev libpython3.5-dev libboost-python-dev\
-                       libblas-dev liblapacke-dev libfftw3-dev libgsl-dev libcfitsio3-dev wcslib-dev
-    apt-get install -y libboost-program-options1.58-dev libboost-filesystem1.58-dev libboost-system1.58-dev libboost-python1.58-dev libboost-thread1.58-dev libboost-regex1.58-dev
-    apt-get install -y libqt4-dev pgplot5 libpgsbox-dev openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev libqwt-dev libxerces-c-dev libsqlite3-dev liblog4cxx-dev 
+                       build-essential gfortran git wget cmake flex bison g++ xvfb
+    apt-get install -y libcfitsio-dev libreadline-dev libncurses5-dev libhdf5-serial-dev libpython3.6-dev libboost-python-dev\
+                       libblas-dev liblapacke-dev libfftw3-dev libgsl-dev libcfitsio-dev wcslib-dev
+    apt-get install -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libboost-python-dev libboost-thread-dev libboost-regex-dev
+    apt-get install -y libqt4-dev pgplot5 openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev libqwt-dev libsqlite3-dev liblog4cxx-dev 
     apt-get install -y doxygen swig
     apt-get clean
     # We need an older version of libeigen3 for libsakura
     wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb
     dpkg -i libeigen3-dev_3.2.0-8_all.deb
     rm libeigen3-dev_3.2.0-8_all.deb
+    # Default libxerces in 18.04 is too new for casa code, use older version
+    wget http://launchpadlibrarian.net/344856440/libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
+    wget http://launchpadlibrarian.net/344856431/libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
+    dpkg -i libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
+    dpkg -i libxerces-c-dev_3.1.4+debian-2build2_amd64.deb    
 
     # install jupyter
-    apt-get install -y gfortran build-essential python-numpy-dev
     pip install --upgrade pip
     /usr/local/bin/pip install jupyter
     
@@ -65,16 +73,26 @@ IncludeCmd: no
     rm -rf libsakura
     
     # casa data needs git lfs support
-    wget https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-linux-amd64-2.3.4.tar.gz
-    tar zxvf git-lfs-linux-amd64-2.3.4.tar.gz
-    git-lfs-2.3.4/install.sh
-    rm -rf git-lfs-2.3.4 git-lfs-linux-amd64-2.3.4.tar.gz
+    wget https://github.com/git-lfs/git-lfs/releases/download/v2.4.2/git-lfs-linux-amd64-2.4.2.tar.gz
+    tar zxvf git-lfs-linux-amd64-2.4.2.tar.gz
+    git-lfs-2.4.2/install.sh
+    rm -rf git-lfs-2.4.2 git-lfs-linux-amd64-2.4.2.tar.gz
+
+    # SOFA library
+    #wget http://www.iausofa.org/2018_0130_C/sofa_c-20180130.tar.gz
+    #tar zxvf sofa_c-20180130.tar.gz
+    #cd sofa/20180130/c/src
+    #sed -i 's/INSTALL_DIR = $(HOME)/INSTALL_DIR = \/usr\/local/' makefile
+    #make
+    #make test
+    #cd
+    #rm -rf sofa sofa_c-20180130.tar.gz
 
     # Build casa
-    export HOST_CPU_CORES=4
+    export HOST_CPU_CORES=8
     export CASA_BUILD_TYPE=Release
     export CASA_ARCH=linux64
-    export CASA_BRANCH=release/5.1.2
+    export CASA_BRANCH=release/5.3.0
     export workDir=/usr/local/casa
     export CASAPATH="$workDir $CASA_ARCH"
 
@@ -91,7 +109,8 @@ IncludeCmd: no
     # Build casacore
     mkdir $workDir/casacore/build
     cd $workDir/casacore/build
-    cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DUseCasacoreNamespace=1 2>&1 | tee cmake.log 
+    #cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DUseCasacoreNamespace=1 2>&1 | tee cmake.log 
+    cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DCASA_BUILD=ON -DUSE_HDF5=ON 2>&1 | tee cmake.log 
     make -j$HOST_CPU_CORES
     make install
     cd $workDir
@@ -106,8 +125,8 @@ IncludeCmd: no
     wget https://svn.cv.nrao.edu/casa/devel/googletest/googletest-release-1.7.0.tar.gz
     tar zxvf googletest-release-1.7.0.tar.gz
     cd ../breakpad
-    wget https://casa.nrao.edu/download/devel/breakpad//breakpad-from-google-160426-patch3.tgz
-    tar zxvf breakpad-from-google-160426-patch3.tgz
+    wget https://casa.nrao.edu/download/devel/breakpad/breakpad-from-google-180213-patch2.tgz
+    tar zxvf breakpad-from-google-180213-patch2.tgz
     cd ..
     cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DINTERACTIVE_ITERATION=1 -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH 2>&1 | tee cmake.log
     make -j$HOST_CPU_CORES

@@ -54,7 +54,7 @@ RUN wget https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-lin
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \
     CASA_ARCH=linux64 \
-    CASA_BRANCH=release/5.1.1 \
+    CASA_BRANCH=release/5.1.2 \
     workDir=/usr/local/casa \
     CASAPATH="$workDir $CASA_ARCH"
 

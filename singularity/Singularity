@@ -74,7 +74,7 @@ IncludeCmd: no
     export HOST_CPU_CORES=4
     export CASA_BUILD_TYPE=Release
     export CASA_ARCH=linux64
-    export CASA_BRANCH=release/5.1.1
+    export CASA_BRANCH=release/5.1.2
     export workDir=/usr/local/casa
     export CASAPATH="$workDir $CASA_ARCH"
 

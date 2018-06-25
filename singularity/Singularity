@@ -17,6 +17,9 @@ IncludeCmd: no
 %setup
   # Get timezone information from host
   date +%Z > ${SINGULARITY_ROOTFS}/etc/timezone
+  # Add jupyter-casa tree to container
+  mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+  cp -r jupyter python asap.patch ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
 
 %post
     # Setup enviroment
@@ -149,6 +152,8 @@ IncludeCmd: no
     rm -rf gcWrap
  
     # Build asap
+    cd $workDir/casa-asap
+    patch -p1 </usr/local/jupyter-casa/asap.patch
     mkdir $workDir/casa-asap/build
     cd $workDir/casa-asap/build
     cmake .. -Darch=$CASA_ARCH -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DPYTHON_LIBNAME=2.7 -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE 2>&1 | tee cmake.log
@@ -158,8 +163,7 @@ IncludeCmd: no
     rm -rf code
 
     # Install jupyter casa wrapper
-    cd $workDir
-    git clone https://github.com/aardk/jupyter-casa.git
+    cd /usr/local
     mkdir -p /usr/local/lib/python2.7/dist-packages
     mv jupyter-casa/python/casapy /usr/local/lib/python2.7/dist-packages/
     cp -r jupyter-casa/jupyter /usr/local/share/

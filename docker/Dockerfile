@@ -24,7 +24,7 @@ RUN wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb \
 # install jupyter
 RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && pip install --upgrade pip \
-    && /usr/local/bin/pip install jupyter
+    && /usr/local/bin/pip install "notebook<5.5"
 
 # Dependencies - RPFITS
 RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.24.tar.gz \

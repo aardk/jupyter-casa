@@ -14,6 +14,9 @@ IncludeCmd: no
     # Remove Juputer user imported from Docker
     sed -i '/jupyter/d' /etc/passwd
     sed -i '/jupyter/d' /etc/shadow
+    # In docker we use jupyter notebook 5.4, however, in Singularity we
+    # can use the most recent version
+    /usr/local/bin/pip install -U --upgrade-strategy=eager notebook
 
 %environment
   unset XDG_RUNTIME_DIR 

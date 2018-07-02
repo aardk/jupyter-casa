@@ -1,5 +1,5 @@
 {
-   "argv": ["python", "-m", "casapy",
+   "argv": ["python", "-m", "start_casa",
                "-f", "{connection_file}"],
    "mimetype": "text/plain",
    "display_name": "Casa",

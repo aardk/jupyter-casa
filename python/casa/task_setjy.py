@@ -544,7 +544,7 @@ def nselrows(vis, field='', spw='', obs='', timerange='', scan='', intent='', us
 #            st.close() # needed to clear tablecache? 
 #            mytb.close()
             myms.msselect(msselargs)
-            retval = myms.nrow()
+            retval = myms.nrow(True)
             myms.close()
         except Exception, instance:
             #if ismms:

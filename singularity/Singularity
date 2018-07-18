@@ -88,16 +88,6 @@ IncludeCmd: no
     git-lfs-2.4.2/install.sh
     rm -rf git-lfs-2.4.2 git-lfs-linux-amd64-2.4.2.tar.gz
 
-    # SOFA library
-    #wget http://www.iausofa.org/2018_0130_C/sofa_c-20180130.tar.gz
-    #tar zxvf sofa_c-20180130.tar.gz
-    #cd sofa/20180130/c/src
-    #sed -i 's/INSTALL_DIR = $(HOME)/INSTALL_DIR = \/usr\/local/' makefile
-    #make
-    #make test
-    #cd
-    #rm -rf sofa sofa_c-20180130.tar.gz
-
     # Build casa
     export HOST_CPU_CORES=8
     export CASA_BUILD_TYPE=Release
@@ -165,12 +155,11 @@ IncludeCmd: no
     # Install jupyter casa wrapper
     cd /usr/local
     mkdir -p /usr/local/lib/python2.7/dist-packages
-    mv jupyter-casa/python/casapy /usr/local/lib/python2.7/dist-packages/
+    mv jupyter-casa/python/start_casa /usr/local/lib/python2.7/dist-packages/
     cp -r jupyter-casa/jupyter /usr/local/share/
     # Copy fixed casa tasked
     cp jupyter-casa/python/casa/TablePlotTkAgg.py $workDir/linux64/lib/python2.7
     cp jupyter-casa/python/casa/task_setjy.py $workDir/linux64/lib/python2.7
-    cp jupyter-casa/python/casa/casa_stack_manip.py $workDir/linux64/lib/python2.7
     rm -rf jupyter-casa
 
     # Some cleanup TODO: We could remove much more

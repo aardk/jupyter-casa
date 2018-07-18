@@ -24,7 +24,9 @@ RUN wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb \
 # install jupyter
 RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && pip install --upgrade pip \
-    && /usr/local/bin/pip install "notebook<5.5"
+    && /usr/local/bin/pip install "notebook<5.5" widgetsnbextension \
+    # Enable ipywidgets
+    && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 # Dependencies - RPFITS
 RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.24.tar.gz \
@@ -116,21 +118,17 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf casa-asap \
-    && rm -rf code \
-    && rm -rf .git
+    && rm -rf code 
 
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python2.7/dist-packages
-COPY python/casapy /usr/local/lib/python2.7/dist-packages/casapy 
+COPY python/start_casa /usr/local/lib/python2.7/dist-packages/start_casa
 COPY jupyter /usr/local/share/jupyter
-COPY python/casa/TablePlotTkAgg.py python/casa/task_setjy.py python/casa/casa_stack_manip.py $workDir/linux64/lib/python2.7/ 
-
-# Enable ipywidgets
-RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
+COPY python/casa/TablePlotTkAgg.py python/casa/task_setjy.py $workDir/linux64/lib/python2.7/ 
 
 # Disable ipv6
-RUN echo "net.ipv6.conf.all.disable_ipv6 = 1\n net.ipv6.conf.default.disable_ipv6 = 1\n net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.d/99-sysctl.conf \
-    && cat /etc/sysctl.d/99-sysctl.conf 
+#RUN echo "net.ipv6.conf.all.disable_ipv6 = 1\n net.ipv6.conf.default.disable_ipv6 = 1\n net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.d/99-sysctl.conf \
+#    && cat /etc/sysctl.d/99-sysctl.conf 
 
 RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter
 EXPOSE 8888

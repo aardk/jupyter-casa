@@ -24,7 +24,7 @@ RUN wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb \
 # install jupyter
 RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && pip install --upgrade pip \
-    && /usr/local/bin/pip install "notebook<5.5" widgetsnbextension \
+    && /usr/local/bin/pip install "ipykernel<4.9.0" "notebook<5.5" widgetsnbextension \
     # Enable ipywidgets
     && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 

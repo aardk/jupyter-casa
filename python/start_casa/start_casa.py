@@ -16,6 +16,7 @@ __pylib = os.path.dirname(os.path.realpath(casa_system_defaults.__file__))
 __init_scripts = [
     "init_begin_startup.py",
     "init_system.py",
+    "init_telemetry.py",
     "init_logger.py",
     "init_user_pre.py",
     "init_dbus.py",

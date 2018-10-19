@@ -19,7 +19,7 @@ IncludeCmd: no
   date +%Z > ${SINGULARITY_ROOTFS}/etc/timezone
   # Add jupyter-casa tree to container
   mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
-  cp -r jupyter python asap.patch ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+  cp -r jupyter python asap.patch casacore.patch ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
 
 %post
     # Setup enviroment
@@ -108,10 +108,12 @@ IncludeCmd: no
     rm -rf .git
 
     # Build casacore
+    cd $workDir/casacore
+    patch -p1 </usr/local/jupyter-casa/casacore.patch
     mkdir $workDir/casacore/build
     cd $workDir/casacore/build
     #cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DUseCasacoreNamespace=1 2>&1 | tee cmake.log 
-    cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DCASA_BUILD=ON -DUSE_HDF5=ON -DBUILD_PYTHON=ON 2>&1 | tee cmake.log 
+    cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DCASA_BUILD=ON -DUSE_HDF5=ON -DBUILD_PYTHON=ON 2>&1 | tee cmake.log 
     make -j$HOST_CPU_CORES
     make install
     cd $workDir

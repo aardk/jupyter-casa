@@ -1,0 +1,37 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 257617304..95b172439 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -58,7 +58,6 @@ enable_language (Fortran)
+ set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+ 
+ # By default build only Python2 bindings
+-option (BUILD_PYTHON "Build the python bindings" YES)
+ option (BUILD_PYTHON3 "Build the python3 bindings" NO)
+ 
+ # By default build shared libraries
+@@ -93,13 +92,14 @@ endif()
+ 
+ # basic setup for building within CASA environment
+ if( CASA_BUILD )
++   #By default don't build python bindings in CASA enviroment
++   option (BUILD_PYTHON "Build the python bindings" NO)
+    if( NOT DATA_DIR )
+       set(DATA_DIR "%CASAROOT%/data")
+    endif( )
+    set(USE_FFTW3 ON)
+    set(USE_OPENMP ON)
+    set(USE_THREADS ON)
+-   set(BUILD_PYTHON OFF)
+    set(Boost_NO_BOOST_CMAKE 1)
+    if (EXISTS "/opt/casa/02/include/python2.7")
+       ### RHEL7
+@@ -134,6 +134,8 @@ if( CASA_BUILD )
+          set(BOOST_ROOT="/usr")
+       endif( )
+    endif( )
++else ( )
++   option (BUILD_PYTHON "Build the python bindings" YES)
+ endif( )
+ 
+ # Test if shared libraries have to be built.

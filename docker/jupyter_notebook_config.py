@@ -156,7 +156,7 @@ c.NotebookApp.disable_check_xsrf = True
 #c.NotebookApp.iopub_msg_rate_limit = 0
 
 ## The IP address the notebook server will listen on.
-c.NotebookApp.ip = '*'
+c.NotebookApp.ip = '0.0.0.0'
 
 ## Supply extra arguments that will be passed to Jinja environment.
 #c.NotebookApp.jinja_environment_options = {}

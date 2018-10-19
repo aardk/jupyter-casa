@@ -1,20 +1,28 @@
-FROM ubuntu:16.04
-RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial multiverse" >> /etc/apt/sources.list \
-    && echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial-updates multiverse" >> /etc/apt/sources.list \
+FROM ubuntu:18.04
+RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic multiverse" >> /etc/apt/sources.list \
+    && echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic-updates multiverse" >> /etc/apt/sources.list \
     && apt-get update && apt-get install -y apt-utils debconf-utils && apt-get -y upgrade && apt-get clean
 
-RUN apt-get install -y python2.7 python-dev python-numpy python-matplotlib python-scipy python-pip python-nose python-dbus \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get install -y python2.7 python-dev python-numpy python-scipy python-pip python-nose python-tk python-dbus \
                        build-essential git wget cmake flex bison g++ xvfb libcfitsio-dev libreadline6-dev libncurses5-dev \
-                       libhdf5-serial-dev libpython3.5-dev libboost-python-dev libblas-dev liblapacke-dev libfftw3-dev \
-                       libcfitsio3-dev wcslib-dev libboost-program-options1.58-dev libboost-filesystem1.58-dev \
-                       libboost-system1.58-dev libboost-python1.58-dev libboost-thread1.58-dev libboost-regex1.58-dev \
-                       libqt4-dev pgplot5 libpgsbox-dev openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev \
-                       libqwt-dev libxerces-c-dev libsqlite3-dev liblog4cxx-dev doxygen swig \
+                       libhdf5-serial-dev libpython3.6-dev libboost-python-dev libblas-dev liblapacke-dev libfftw3-dev \
+                       wcslib-dev libboost-program-options-dev libboost-filesystem-dev \
+                       libboost-system-dev libboost-python-dev libboost-thread-dev libboost-regex-dev \
+                       libqt4-dev pgplot5 openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev \
+                       libqwt-dev libsqlite3-dev liblog4cxx-dev doxygen swig libgsl-dev \
     && apt-get clean
 
 # Libgsl from 16.04 is too old for CASA, get the version from 18.04
-RUN for i in libgslcblas0_2.4+dfsg-6_amd64.deb libgsl23_2.4+dfsg-6_amd64.deb libgsl-dev_2.4+dfsg-6_amd64.deb; \
-    do wget http://nl.archive.ubuntu.com/ubuntu/pool/universe/g/gsl/$i; dpkg -i $i; rm $i; done
+#RUN for i in libgslcblas0_2.4+dfsg-6_amd64.deb libgsl23_2.4+dfsg-6_amd64.deb libgsl-dev_2.4+dfsg-6_amd64.deb; \
+#    do wget http://nl.archive.ubuntu.com/ubuntu/pool/universe/g/gsl/$i; dpkg -i $i; rm $i; done
+
+# Default libxerces in 18.04 is too new for casa code, use older version
+RUN wget http://launchpadlibrarian.net/344856440/libxerces-c3.1_3.1.4+debian-2build2_amd64.deb \
+    && wget http://launchpadlibrarian.net/344856431/libxerces-c-dev_3.1.4+debian-2build2_amd64.deb \
+    && dpkg -i libxerces-c3.1_3.1.4+debian-2build2_amd64.deb \
+    && dpkg -i libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
 
 # We need an older version of libeigen3 for libsakura
 RUN wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb \
@@ -24,7 +32,7 @@ RUN wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb \
 # install jupyter
 RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && pip install --upgrade pip \
-    && /usr/local/bin/pip install "ipykernel<4.9.0" "notebook<5.5" widgetsnbextension \
+    && /usr/local/bin/pip install matplotlib notebook widgetsnbextension \
     # Enable ipywidgets
     && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
@@ -60,12 +68,12 @@ RUN wget https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-lin
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \
     CASA_ARCH=linux64 \
-    CASA_BRANCH=release/5.3.0 \
+    CASA_BRANCH=release/5.4.0 \
     workDir=/usr/local/casa \
     CASAPATH="$workDir $CASA_ARCH"
 
 # ASAP need this patch to compile
-COPY asap.patch /root
+COPY asap.patch casacore.patch /root/
 
 # Build casa
 RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git $workDir \
@@ -78,9 +86,11 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     # cleanup git, saves ~600MB
     && rm -rf .git ../git\
     # Build casacore
+    && cd $workDir/casacore \
+    && patch -p1 < /root/casacore.patch \
     && mkdir $workDir/casacore/build \
     && cd $workDir/casacore/build \
-    && cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DCASA_BUILD=ON -DUSE_HDF5=ON -DBUILD_PYTHON=ON \
+    && cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DCASA_BUILD=ON -DUSE_HDF5=ON -DBUILD_PYTHON=ON \
     && make -j$HOST_CPU_CORES \
     && make install \
     && cd $workDir \

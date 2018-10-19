@@ -15,8 +15,6 @@ IncludeCmd: no
   unset XDG_RUNTIME_DIR 
 
 %setup
-  # Get timezone information from host
-  date +%Z > ${SINGULARITY_ROOTFS}/etc/timezone
   # Add jupyter-casa tree to container
   mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
   cp -r jupyter python asap.patch casacore.patch ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa

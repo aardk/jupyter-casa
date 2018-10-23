@@ -93,6 +93,8 @@ class CasapyKernel(IPythonKernel):
             errorhappened = any(['Some arguments failed to verify' in logline
                                    for logline in loglines]) or \
                             any(['Please check that the file ' in logline
+                                   for logline in loglines]) or \
+                            any(['An error occurred' in logline
                                    for logline in loglines])
             if errorhappened:
                 errorcolor = ' style="background-color:red"'

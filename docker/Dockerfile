@@ -3,7 +3,7 @@ RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial multiverse" >> /etc/ap
     && echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial-updates multiverse" >> /etc/apt/sources.list \
     && apt-get update && apt-get install -y apt-utils debconf-utils && apt-get -y upgrade && apt-get clean
 
-RUN apt-get install -y python2.7 python-dev python-numpy python-matplotlib python-scipy python-pip python-nose python-dbus \
+RUN apt-get install -y python2.7 python-dev python-numpy python-scipy python-pip python-nose python-dbus \
                        build-essential git wget cmake flex bison g++ xvfb libcfitsio-dev libreadline6-dev libncurses5-dev \
                        libhdf5-serial-dev libpython3.5-dev libboost-python-dev libblas-dev liblapacke-dev libfftw3-dev \
                        libgsl-dev libcfitsio3-dev wcslib-dev libboost-program-options1.58-dev libboost-filesystem1.58-dev \
@@ -20,7 +20,9 @@ RUN wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb \
 # install jupyter
 RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && pip install --upgrade pip \
-    && /usr/local/bin/pip install "notebook<5.5"
+    && /usr/local/bin/pip install matplotlib notebook widgetsnbextension \
+    # Enable ipywidgets
+    && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 # Dependencies - RPFITS
 RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.24.tar.gz \

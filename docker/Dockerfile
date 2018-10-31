@@ -37,8 +37,8 @@ RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 # Dependencies - RPFITS
-RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.24.tar.gz \
-    && tar zxvf rpfits-2.24.tar.gz \
+RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.25.tar.gz \
+    && tar zxvf rpfits-2.25.tar.gz \
     && cd rpfits/linux64 \
     && make install \
     && cd ../.. \

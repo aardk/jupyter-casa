@@ -26,7 +26,7 @@ IncludeCmd: no
 
     export LC_ALL=C
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y
-    apt-get install -y python2.7 python-dev python-numpy python-scipy python-pip python-nose python-dbus\
+    apt-get install -y python2.7 python-dev python-numpy python-scipy python-pip python-nose python-tk python-dbus\
                        build-essential gfortran git wget cmake flex bison g++ xvfb
     apt-get install -y libcfitsio-dev libreadline-dev libncurses5-dev libhdf5-serial-dev libpython3.5-dev libboost-python-dev\
                        libblas-dev liblapacke-dev libfftw3-dev libcfitsio-dev wcslib-dev

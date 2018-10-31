@@ -14,6 +14,11 @@ IncludeCmd: no
   export QT_X11_NO_MITSHM=1
   unset XDG_RUNTIME_DIR 
 
+%setup
+  # Add jupyter-casa tree to container
+  mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+  cp -r jupyter python ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+
 %post
     # Setup enviroment
     echo deb http://nl.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse >/etc/apt/sources.list
@@ -140,7 +145,6 @@ IncludeCmd: no
 
     # Install jupyter casa wrapper
     cd $workDir
-    git clone https://github.com/aardk/jupyter-casa.git
     mkdir -p /usr/local/lib/python2.7/dist-packages
     mv jupyter-casa/python/casapy /usr/local/lib/python2.7/dist-packages/
     cp -r jupyter-casa/jupyter /usr/local/share/

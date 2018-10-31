@@ -25,8 +25,8 @@ RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 # Dependencies - RPFITS
-RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.24.tar.gz \
-    && tar zxvf rpfits-2.24.tar.gz \
+RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.25.tar.gz \
+    && tar zxvf rpfits-2.25.tar.gz \
     && cd rpfits/linux64 \
     && make install \
     && cd ../.. \
@@ -70,7 +70,7 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && git show HEAD:distro | bash \
     # cleanup git, saves ~600MB
     && rm -rf .git \
-
+    #
     # Build casacore
     && mkdir $workDir/casacore/build \
     && cd $workDir/casacore/build \
@@ -79,7 +79,7 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make install \
     && cd $workDir \
     && rm -rf casacore \
-
+    #
     # build casa code
     && mkdir $workDir/code/build \
     && cd $workDir/code/build \
@@ -96,7 +96,7 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf code/build \ 
-
+    #
     # build gcwrap
     && mkdir $workDir/gcwrap/build \
     && cd $workDir/gcwrap/build \
@@ -104,7 +104,7 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && make -j$HOST_CPU_CORES \
     && cd $workDir \
     && rm -rf gcWrap \
-
+    #
     # Build asap
     && mkdir $workDir/casa-asap/build \
     && cd $workDir/casa-asap/build \

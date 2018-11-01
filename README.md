@@ -59,7 +59,7 @@ Therefore the local X11 socket needs to be shared with Docker container.
 The simplest incantation to start JUPYTER on a recent Ubuntu:
 
 `
-docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
+docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY penngwyn/jupytercasa 
 `
 
 Note that the `'--rm'` option will make DOCKER delete the container after use.
@@ -68,7 +68,7 @@ Of course the above example is not very useful as the container will not be able
 To add a data directory to the DOCKER container is, fortunately, very simple using the `-v` option:
 
 `
-docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
+docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa
 `
 
 Where `PATH_TO_DATA_DIR` should be replaced with the full path to your local data directory.
@@ -77,7 +77,7 @@ The above examples use a JUPYTER kernel which is baked into the DOCKER image. It
 within the CASA container, from the root of the source tree run:
 
 `
-docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v $PWD/jupyter:/home/jupyter/.local/share/jupyter -v $PWD/python/casapy:/home/jupyter/.local/lib/python2.7/site-packages/casapy -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa /bin/sh -c "jupyter notebook"
+docker run --rm -p 8888:8888 -i -t -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -v $PWD/jupyter:/home/jupyter/.local/share/jupyter -v $PWD/python/casapy:/home/jupyter/.local/lib/python2.7/site-packages/casapy -v PATH_TO_DATA_DIR:/home/jupyter/data penngwyn/jupytercasa 
 ` 
 
 ## Examples

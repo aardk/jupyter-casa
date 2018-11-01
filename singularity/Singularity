@@ -145,7 +145,7 @@ IncludeCmd: no
     rm -rf code
 
     # Install jupyter casa wrapper
-    cd $workDir
+    cd /usr/local
     mkdir -p /usr/local/lib/python2.7/dist-packages
     mv jupyter-casa/python/casapy /usr/local/lib/python2.7/dist-packages/
     cp -r jupyter-casa/jupyter /usr/local/share/
@@ -158,4 +158,4 @@ IncludeCmd: no
     # Some cleanup TODO: We could remove much more
     apt-get autoremove -y
     apt-get clean
-    rm -rf .git
+    rm -rf $workDir/.git

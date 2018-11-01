@@ -1,4 +1,5 @@
 FROM ubuntu:16.04
+CMD ["jupyter", "notebook"]
 RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial multiverse" >> /etc/apt/sources.list \
     && echo "deb http://nl.archive.ubuntu.com/ubuntu/ xenial-updates multiverse" >> /etc/apt/sources.list \
     && apt-get update && apt-get install -y apt-utils debconf-utils && apt-get -y upgrade && apt-get clean

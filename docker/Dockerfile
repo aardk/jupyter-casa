@@ -38,7 +38,7 @@ RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.25.tar.gz \
     && rm -rf rpfits*
 
 # Dependencies - LIBSAKURA
-RUN git clone https://github.com/CARTAvis/libsakura \
+RUN git clone https://github.com/aardk/libsakura \
     && cd libsakura \
     && wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz \
     && tar zxvf release-1.7.0.tar.gz \

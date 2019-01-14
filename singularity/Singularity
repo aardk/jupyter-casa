@@ -53,8 +53,8 @@ IncludeCmd: no
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
     
     # Dependencies - RPFITS
-    wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.25.tar.gz
-    tar zxvf rpfits-2.25.tar.gz  
+    wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits.tar.gz
+    tar zxvf rpfits.tar.gz  
     cd rpfits/linux64
     make install
     cd ../..

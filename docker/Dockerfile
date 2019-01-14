@@ -53,10 +53,14 @@ RUN git clone https://github.com/aardk/libsakura \
     && rm -rf libsakura
 
 # casa data needs git lfs support
-RUN wget https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-linux-amd64-2.3.4.tar.gz \
-    && tar zxvf git-lfs-linux-amd64-2.3.4.tar.gz \
-    && git-lfs-2.3.4/install.sh \
-    && rm -rf git-lfs-2.3.4 git-lfs-linux-amd64-2.3.4.tar.gz
+ENV LFSVERSION=v2.6.1
+RUN mkdir -p gitlfs-${LFSVERSION} \
+    && cd gitlfs-${LFSVERSION} \
+    && wget https://github.com/git-lfs/git-lfs/releases/download/${LFSVERSION}/git-lfs-linux-amd64-${LFSVERSION}.tar.gz \
+    && tar zxvf git-lfs-linux-amd64-${LFSVERSION}.tar.gz \
+    && ./install.sh \
+    && cd .. \
+    && rm -rf gitlfs-${LFSVERSION}
 
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \

@@ -1,5 +1,6 @@
 # jupyter-casa
 A [Jupyter](http://jupyter.org/) kernel for [CASA](https://casa.nrao.edu/)
+NB: This branch uses the [minimal recomputation framework](https://github.com/bnikolic/recipe)
 
 ## Introduction
 

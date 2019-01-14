@@ -57,8 +57,8 @@ IncludeCmd: no
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
     
     # Dependencies - RPFITS
-    wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.25.tar.gz
-    tar zxvf rpfits-2.25.tar.gz  
+    wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits.tar.gz
+    tar zxvf rpfits.tar.gz  
     cd rpfits/linux64
     make install
     cd ../..
@@ -70,7 +70,7 @@ IncludeCmd: no
     rm release-1.7.0.tar.gz
   
     # Dependencies - LIBSAKURA
-    git clone https://github.com/CARTAvis/libsakura
+    git clone https://github.com/aardk/libsakura
     ln -s /googletest-release-1.7.0 libsakura/gtest
     mkdir libsakura/build
     cd libsakura/build
@@ -82,10 +82,14 @@ IncludeCmd: no
     rm -rf libsakura
     
     # casa data needs git lfs support
-    wget https://github.com/git-lfs/git-lfs/releases/download/v2.4.2/git-lfs-linux-amd64-2.4.2.tar.gz
-    tar zxvf git-lfs-linux-amd64-2.4.2.tar.gz
-    git-lfs-2.4.2/install.sh
-    rm -rf git-lfs-2.4.2 git-lfs-linux-amd64-2.4.2.tar.gz
+    export LFSVERSION=v2.6.1
+    mkdir -p gitlfs-${LFSVERSION}
+    cd gitlfs-${LFSVERSION}
+    wget https://github.com/git-lfs/git-lfs/releases/download/${LFSVERSION}/git-lfs-linux-amd64-${LFSVERSION}.tar.gz
+    tar zxvf git-lfs-linux-amd64-${LFSVERSION}.tar.gz
+    ./install.sh
+    cd ..
+    rm -rf gitlfs-${LFSVERSION}
 
     # Build casa
     export HOST_CPU_CORES=8

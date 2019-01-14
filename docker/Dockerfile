@@ -38,15 +38,15 @@ RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 # Dependencies - RPFITS
-RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits-2.25.tar.gz \
-    && tar zxvf rpfits-2.25.tar.gz \
+RUN wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits.tar.gz \
+    && tar zxvf rpfits.tar.gz \
     && cd rpfits/linux64 \
     && make install \
     && cd ../.. \
     && rm -rf rpfits*
 
 # Dependencies - LIBSAKURA
-RUN git clone https://github.com/CARTAvis/libsakura \
+RUN git clone https://github.com/aardk/libsakura \
     && cd libsakura \
     && wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz \
     && tar zxvf release-1.7.0.tar.gz \
@@ -61,10 +61,14 @@ RUN git clone https://github.com/CARTAvis/libsakura \
     && rm -rf libsakura
 
 # casa data needs git lfs support
-RUN wget https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-linux-amd64-2.3.4.tar.gz \
-    && tar zxvf git-lfs-linux-amd64-2.3.4.tar.gz \
-    && git-lfs-2.3.4/install.sh \
-    && rm -rf git-lfs-2.3.4 git-lfs-linux-amd64-2.3.4.tar.gz
+ENV LFSVERSION=v2.6.1
+RUN mkdir -p gitlfs-${LFSVERSION} \
+    && cd gitlfs-${LFSVERSION} \
+    && wget https://github.com/git-lfs/git-lfs/releases/download/${LFSVERSION}/git-lfs-linux-amd64-${LFSVERSION}.tar.gz \
+    && tar zxvf git-lfs-linux-amd64-${LFSVERSION}.tar.gz \
+    && ./install.sh \
+    && cd .. \
+    && rm -rf gitlfs-${LFSVERSION}
 
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \

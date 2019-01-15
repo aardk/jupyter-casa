@@ -97,3 +97,18 @@ index 1ae132d..e6100fb 100644
  
  };
  } // namespace
+diff --git a/src/STMath.cpp b/src/STMath.cpp
+index 057b88f..19b2d35 100644
+--- a/src/STMath.cpp
++++ b/src/STMath.cpp
+@@ -294,7 +294,8 @@ STMath::average( const std::vector<CountedPtr<Scantable> >& in,
+       uInt const values1[] = { current.asuInt("IFNO"), current.asuInt("BEAMNO"), current.asuInt("POLNO") };
+       SingleTypeEqPredicate<uInt, 3> myPred(tin, colNames1, values1);
+       CustomTableExprNodeRep myNodeRep(tin, myPred);
+-      myNodeRep.link(); // to avoid automatic delete when myExpr is destructed.
++      // (aardk) NB: ExprNodeRep no longer has a reference counter
++      //myNodeRep.link(); // to avoid automatic delete when myExpr is destructed.
+       CustomTableExprNode myExpr(myNodeRep);
+       Table basesubt = tin(myExpr);
+ #else
+

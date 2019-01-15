@@ -53,7 +53,10 @@ RUN git clone https://github.com/aardk/libsakura \
     && ln -s googletest-release-1.7.0 gtest \
     && mkdir build \
     && cd build \
-    && cmake .. \
+    # Local compiles:
+    # cmake -DSIMD_ARCH=NATIVE ..
+    # For distribution purposes:
+    && cmake -DSIMD_ARCH=SSE4 .. \
     && make \
     && make apidoc \
     && make install \
@@ -73,7 +76,7 @@ RUN mkdir -p gitlfs-${LFSVERSION} \
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \
     CASA_ARCH=linux64 \
-    CASA_BRANCH=release/5.4.0 \
+    CASA_BRANCH=release/5.4.1 \
     workDir=/usr/local/casa \
     CASAPATH="$workDir $CASA_ARCH"
 

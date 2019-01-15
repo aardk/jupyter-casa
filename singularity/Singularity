@@ -70,7 +70,8 @@ IncludeCmd: no
     ln -s /googletest-release-1.7.0 libsakura/gtest
     mkdir libsakura/build
     cd libsakura/build
-    cmake ..
+    # cmake -DSIMD_ARCH=NATIVE ..
+    cmake -DSIMD_ARCH=SSE4 .. # For distribution purposes
     make
     make apidoc
     make install

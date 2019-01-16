@@ -2,7 +2,7 @@
 # We use this on singularity hub, because it currently
 # doesn't have enough resources to build casa.
 Bootstrap: docker
-From: penngwyn/jupytercasa
+From: penngwyn/jupytercasa:casa-5.1
 IncludeCmd: no
 
 %runscript

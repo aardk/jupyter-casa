@@ -168,6 +168,9 @@ IncludeCmd: no
     cp jupyter-casa/python/casa/task_setjy.py $workDir/linux64/lib/python2.7
     rm -rf jupyter-casa
 
+    # Install recipe (the minimal recomputation framework)
+    /usr/local/bin/pip install git+https://github.com/aardk/recipe.git
+
     # Some cleanup TODO: We could remove much more
     apt-get autoremove -y
     apt-get clean

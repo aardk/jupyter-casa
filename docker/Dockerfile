@@ -160,4 +160,6 @@ ENV PYTHONPATH="/usr/local/lib/python2.7/dist-packages:/usr/local/casa/linux64/l
 RUN mkdir -p /home/jupyter/.jupyter
 COPY --chown=jupyter:jupyter docker/jupyter_notebook_config.py /home/jupyter/.jupyter
 COPY --chown=jupyter:jupyter docker/create_font_cache.py /home/jupyter
+# Install recipe (the minimal recomputation framework)
+RUN /usr/local/bin/pip install git+https://github.com/aardk/recipe.git
 RUN python create_font_cache.py

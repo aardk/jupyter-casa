@@ -1,4 +1,5 @@
 from recipe import casatasks as c
+from functools import wraps
 import inspect
 import IPython
 
@@ -57,23 +58,21 @@ def wrap_listfile(task):
 def wrap_plotms(task):
     @wraps(task)
     def wrapped_task(*args, **kwargs):
-        # Set temporary plot if the user didn't already supply a plotfile
-        if set_parameter_if_not_exists(task, 'plotfile', 'plotms_temp.png', args, kwargs):
-            set_parameter(task, 'overwrite', True, args, kwargs)
-        else:
-            set_parameter_if_not_exists(task, 'overwrite', True, args, kwargs)
         # Disable the gui (unless exiplicitly enabled)
         set_parameter_if_not_exists(task, 'showgui' , False, args, kwargs)
 
-        # Run task and print results to the screen
-        retval = task(*args, **kwargs)
-        if retval:
-            plotfile = get_parameter(task, 'plotfile', args, kwargs)
+        # Run task and print results to the screen, 
+        # NB: recipe wrapped task returns name of plotfile
+        plotfile = task(*args, **kwargs)
+        if plotfile:
             # FIXME Getting IPython from the stack
             IPython = inspect.stack()[1][0].f_locals['IPython']
-            i = IPython.display.Image(plotfile)
+            imfmt = get_parameter(task, 'expformat', args, kwargs)
+            if imfmt == None:
+                imfmt = 'png'
+            i = IPython.display.Image(plotfile, format=imfmt)
             IPython.display.display(i)
-        return retval
+        return plotfile
 
     return wrapped_task
 

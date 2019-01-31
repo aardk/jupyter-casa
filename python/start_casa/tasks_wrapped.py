@@ -119,3 +119,4 @@ flagdata = c.flagdata
 clean = c.clean
 concat = c.concat
 setjy = c.setjy
+fluxscale = c.fluxscale

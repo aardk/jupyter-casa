@@ -65,8 +65,6 @@ def wrap_plotms(task):
         # NB: recipe wrapped task returns name of plotfile
         plotfile = task(*args, **kwargs)
         if plotfile:
-            # FIXME Getting IPython from the stack
-            IPython = inspect.stack()[1][0].f_locals['IPython']
             imfmt = get_parameter(task, 'expformat', args, kwargs)
             if imfmt == None:
                 imfmt = 'png'
@@ -92,8 +90,6 @@ def wrap_viewer(task):
         retval = task(*args, **kwargs)
         if retval != False:
             outfile = get_parameter(task, 'outfile', args, kwargs)
-            # FIXME Getting IPython from the stack
-            IPython = inspect.stack()[1][0].f_locals['IPython']
             i = IPython.display.Image(outfile)
             IPython.display.display(i)
         return retval

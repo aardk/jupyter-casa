@@ -148,6 +148,9 @@ COPY python/casa/TablePlotTkAgg.py python/casa/task_setjy.py $workDir/linux64/li
 #RUN echo "net.ipv6.conf.all.disable_ipv6 = 1\n net.ipv6.conf.default.disable_ipv6 = 1\n net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.d/99-sysctl.conf \
 #    && cat /etc/sysctl.d/99-sysctl.conf 
 
+# Install recipe (the minimal recomputation framework)
+RUN /usr/local/bin/pip install git+https://github.com/aardk/recipe.git
+
 RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter
 EXPOSE 8888
 USER jupyter
@@ -160,6 +163,4 @@ ENV PYTHONPATH="/usr/local/lib/python2.7/dist-packages:/usr/local/casa/linux64/l
 RUN mkdir -p /home/jupyter/.jupyter
 COPY --chown=jupyter:jupyter docker/jupyter_notebook_config.py /home/jupyter/.jupyter
 COPY --chown=jupyter:jupyter docker/create_font_cache.py /home/jupyter
-# Install recipe (the minimal recomputation framework)
-RUN /usr/local/bin/pip install git+https://github.com/aardk/recipe.git
 RUN python create_font_cache.py

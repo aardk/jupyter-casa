@@ -1,1 +1,1 @@
-FROM penngwyn/jupytercasa-demo:274776e351fb
+FROM penngwyn/jupytercasa-demo:binder

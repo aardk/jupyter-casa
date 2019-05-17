@@ -1,0 +1,23 @@
+Bootstrap: docker
+From: centos:7
+IncludeCmd: no
+
+%runscript
+    echo "Starting Jupyter"
+    jupyter notebook
+
+%environment
+  export PYTHONPATH="/usr/local/lib/python3.6/dist-packages:/usr/local/casa/linux64/lib/python3.6"
+  export LD_LIBRARY_PATH="/usr/local/casa/linux64/lib"
+  export CASAPATH="/usr/local/casa/ linux64"
+  export PATH="/usr/local/casa/linux64/bin:$PATH"
+  export QT_X11_NO_MITSHM=1
+  unset XDG_RUNTIME_DIR
+
+#%setup
+#  # Add jupyter-casa tree to container
+#  mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+#  cp -r jupyter python asap.patch casacore.patch ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+
+%post
+  export LC_ALL=C

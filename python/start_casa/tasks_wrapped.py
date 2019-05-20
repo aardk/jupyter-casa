@@ -16,7 +16,7 @@ class wrap_casa(object):
     argdef = ','.join(sp[0][:n] + ['{}={}'.format(sp[0][n+i], sp[3][i]) for i in range(ndef)])
     func_def = 'def {name}({argdef}):\n  return task({args})'.format(name = self.name, argdef = argdef, args=','.join(sp[0]))
     func_ns = {'task': task}
-    exec(func_def, func_ns)
+    exec func_def in func_ns
     wrapped_task = func_ns[self.name]
     wrapped_task.__doc__ = self.doc
     wrapped_task.__dict__ = task.__dict__
@@ -24,7 +24,7 @@ class wrap_casa(object):
     return wrapped_task
 
 class wrapper_parameters(object):
-    __SET_NONE, __SET_GLOBAL, __SET_PARAM, __SET_ARG = list(range(4))
+    __SET_NONE, __SET_GLOBAL, __SET_PARAM, __SET_ARG = range(4)
 
     def __init__(self, task, args):
         self.task = task
@@ -47,13 +47,13 @@ class wrapper_parameters(object):
             #    parameter exists as a variable in that context
             # 2. From self.parameters
             frame = self.frame 
-            if key in frame and (frame[key] not in ("", None)):
+            if frame.has_key(key) and (frame[key] not in ("", None)):
                 if overwrite:
                     results[key] = (value, self.__SET_GLOBAL, frame[key])
                     frame[key] = value
                 else:
                     results[key] = (frame[key], self.__SET_NONE, frame[key])
-            elif key in task.parameters and (task.parameters[key] not in ("", None)):
+            elif task.parameters.has_key(key) and (task.parameters[key] not in ("", None)):
                 if overwrite:
                     results[key] = (value, self.__SET_PARAM, task.parameters[key])
                     task.parameters[key] = value
@@ -85,23 +85,23 @@ class wrapper_parameters(object):
         if self.aips_style:
             parameters = self.task.parameters
             frame = self.frame
-            for key, (newval, changed, oldval) in self.results.items():
+            for key, (newval, changed, oldval) in self.results.iteritems():
                 if (changed == self.__SET_PARAM):
                     parameters[key] = oldval
                 elif (changed == self.__SET_GLOBAL):
                     frame[key] = oldval
 
-from casashell.private.listobs import _listobs
-class listobs_wrapped(_listobs, object):
+from listobs_cli import listobs_cli_
+class listobs_wrapped(listobs_cli_, object):
     def print_logfile(self, filename):
         f = open(filename, 'r')
         line = f.readline()
         while line != "":
-            print(line, end=' ')
+            print line,
             line = f.readline()
         f.close()
 
-    @wrap_casa(_listobs.__call__)
+    @wrap_casa(listobs_cli_.__call__)
     def __call__(self, *args):
         params = wrapper_parameters(self, args)
         # Set 'listfile' if not already set, and if we set 'listfile' then also set 'overwrite'
@@ -116,12 +116,11 @@ class listobs_wrapped(_listobs, object):
             self.print_logfile(listfile)
         return retval
 
-# NB: Plotms not working yet!
 # Wrap plotms to inline the output plot into the notebook.
 # Unless explicitly enabled we also disable the gui
-from casashell.private.plotms import _plotms
-class plotms_wrapped(_plotms, object):
-    @wrap_casa(_plotms.__call__)
+from plotms_cli import plotms_cli_
+class plotms_wrapped(plotms_cli_, object):
+    @wrap_casa(plotms_cli_.__call__)
     def __call__(self, *args):
         params = wrapper_parameters(self, args)
         # Set 'plotfile' if not already set, and if we set 'plotfile' then also set 'overwrite'
@@ -142,9 +141,9 @@ class plotms_wrapped(_plotms, object):
 
 # Wrap viewer to inline the output plot into the notebook.
 # Unless explicitly enabled we also disable the gui
-from casashell.private.viewer import _viewer
-class viewer_wrapped(_viewer, object):
-    @wrap_casa(_viewer.__call__)
+from viewer_cli import viewer_cli_
+class viewer_wrapped(viewer_cli_, object):
+    @wrap_casa(viewer_cli_.__call__)
     def __call__(self, *args):
         params = wrapper_parameters(self, args)
 

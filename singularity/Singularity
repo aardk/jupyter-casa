@@ -7,7 +7,7 @@ IncludeCmd: no
     jupyter notebook
 
 %environment
-  export PYTHONPATH="/usr/local/lib/python3.6/dist-packages:/usr/local/casa/linux64/lib/python3.6" 
+  export PYTHONPATH="/usr/local/lib/python2.7/dist-packages:/usr/local/casa/linux64/lib/python2.7" 
   export LD_LIBRARY_PATH="/usr/local/casa/linux64/lib"
   export CASAPATH="/usr/local/casa/ linux64"
   export PATH="/usr/local/casa/linux64/bin:$PATH"
@@ -26,29 +26,23 @@ IncludeCmd: no
 
     export LC_ALL=C
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y
-    apt-get install -y python3 python3-dev python3-numpy python3-scipy python3-pip python3-nose python3-tk python3-dbus\
+    apt-get install -y python2.7 python-dev python-numpy python-scipy python-pip python-nose python-tk python-dbus\
                        build-essential gfortran git wget cmake flex bison g++ xvfb
     apt-get install -y libcfitsio-dev libreadline-dev libncurses5-dev libhdf5-serial-dev libpython3.6-dev libboost-python-dev\
                        libblas-dev liblapacke-dev libfftw3-dev libcfitsio-dev wcslib-dev
     apt-get install -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libboost-python-dev libboost-thread-dev libboost-regex-dev
     apt-get install -y libqt4-dev pgplot5 openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev libqwt-dev libsqlite3-dev liblog4cxx-dev 
     apt-get install -y doxygen swig libgsl-dev
-    apt-get install -y automake autoconf libtool autotools-dev rsync libxerces-c-dev
-    # Build issues using newer gcc
-    apt-get install -y gcc-5 g++-5 gfortran-5
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50
-    update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-5 50
     apt-get clean
     # We need an older version of libeigen3 for libsakura
-    #wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb
-    #dpkg -i libeigen3-dev_3.2.0-8_all.deb
-    #rm libeigen3-dev_3.2.0-8_all.deb
+    wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb
+    dpkg -i libeigen3-dev_3.2.0-8_all.deb
+    rm libeigen3-dev_3.2.0-8_all.deb
     # Default libxerces in 18.04 is too new for casa code, use older version
-    #wget http://launchpadlibrarian.net/344856440/libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
-    #wget http://launchpadlibrarian.net/344856431/libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
-    #dpkg -i libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
-    #dpkg -i libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
+    wget http://launchpadlibrarian.net/344856440/libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
+    wget http://launchpadlibrarian.net/344856431/libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
+    dpkg -i libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
+    dpkg -i libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
     # Libgsl from 16.04 is too old for CASA, get the version from 18.04
     #wget http://nl.archive.ubuntu.com/ubuntu/pool/universe/g/gsl/libgsl23_2.4+dfsg-6_amd64.deb
     #wget http://nl.archive.ubuntu.com/ubuntu/pool/universe/g/gsl/libgslcblas0_2.4+dfsg-6_amd64.deb
@@ -58,7 +52,8 @@ IncludeCmd: no
     #dpkg -i libgsl-dev_2.4+dfsg-6_amd64.deb
     #rm libgsl*2.4+dfsg-6_amd64.deb
     # install jupyter
-    pip3 install matplotlib notebook widgetsnbextension
+    pip install --upgrade pip
+    /usr/local/bin/pip install matplotlib notebook widgetsnbextension
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
     
     # Dependencies - RPFITS
@@ -88,7 +83,7 @@ IncludeCmd: no
     rm -rf libsakura
     
     # casa data needs git lfs support
-    export LFSVERSION=v2.7.2
+    export LFSVERSION=v2.6.1
     mkdir -p gitlfs-${LFSVERSION}
     cd gitlfs-${LFSVERSION}
     wget https://github.com/git-lfs/git-lfs/releases/download/${LFSVERSION}/git-lfs-linux-amd64-${LFSVERSION}.tar.gz
@@ -101,32 +96,31 @@ IncludeCmd: no
     export HOST_CPU_CORES=8
     export CASA_BUILD_TYPE=Release
     export CASA_ARCH=linux64
-    export CASA_BRANCH=master
+    export CASA_BRANCH=release/5.4.1
     export workDir=/usr/local/casa
     export CASAPATH="$workDir $CASA_ARCH"
 
-    mkdir -p $workDir
+    git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git $workDir
     cd $workDir
-    git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casatools.git
     git submodule update --init casacore
+    git clone https://open-bitbucket.nrao.edu/scm/casa/casa-asap.git
     git clone --no-checkout https://open-bitbucket.nrao.edu/scm/casa/casa-data.git $workDir/data
     cd data
     git show HEAD:distro | bash
     # cleanup git, saves ~600MB
     rm -rf .git
 
-   # Build casa tools
-    cd $workDir/casatools
-    scripts/gcw-pick
-    autoconf
-    PYTHON_VERSION=3.6 ./configure
-    ln -s /usr/bin/g++ /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/g++
-    ln -s /usr/bin/gcc /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/gcc
-    ./setup.py genmake
+    # Build casacore
+    cd $workDir/casacore
+    patch -p1 </usr/local/jupyter-casa/casacore.patch
+    mkdir $workDir/casacore/build
+    cd $workDir/casacore/build
+    #cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DCXX11=ON -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DUseCasacoreNamespace=1 2>&1 | tee cmake.log 
+    cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DDATA_DIR=$workDir/data -DUSE_THREADS=ON -DCFITSIO_INCLUDE_DIR=/usr/include/cfitsio -DUSE_FFTW3=ON -DCFITSIO_INCLUDE_DIR=/usr/include -DCASA_BUILD=ON -DUSE_HDF5=ON -DBUILD_PYTHON=ON 2>&1 | tee cmake.log 
     make -j$HOST_CPU_CORES
-    # CASA gets its cflags from sysconfig.get_config_var('CFLAGS'), on ubuntu this sets the
-    # compiler flag -Werror=format-security which will make CASA not build, we need to patch
-    # setup.py so that this flag is filtered out
+    make install
+    cd $workDir
+    rm -rf casacore    
 
     # build casa code
     mkdir $workDir/code/build
@@ -137,8 +131,8 @@ IncludeCmd: no
     wget https://svn.cv.nrao.edu/casa/devel/googletest/googletest-release-1.7.0.tar.gz
     tar zxvf googletest-release-1.7.0.tar.gz
     cd ../breakpad
-    wget https://casa.nrao.edu/download/devel/breakpad/breakpad-from-google-180213-patch3.tgz:
-    tar zxvf breakpad-from-google-180213-patch3.tgz
+    wget https://casa.nrao.edu/download/devel/breakpad/breakpad-from-google-180213-patch2.tgz
+    tar zxvf breakpad-from-google-180213-patch2.tgz
     cd ..
     cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DINTERACTIVE_ITERATION=1 -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH 2>&1 | tee cmake.log
     make -j$HOST_CPU_CORES

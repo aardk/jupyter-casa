@@ -1,3 +1,5 @@
+# **THIS IS A DEVELOPMENT BRANCH, CASA-6 is still in an alpha state**
+
 # jupyter-casa
 A [Jupyter](http://jupyter.org/) kernel for [CASA](https://casa.nrao.edu/)
 

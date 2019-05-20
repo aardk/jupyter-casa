@@ -5,37 +5,28 @@ import traceback
 from ipykernel.ipkernel import IPythonKernel
 from IPython.core.getipython import get_ipython
 import IPython
-if os.environ.has_key('LD_PRELOAD'):
+if 'LD_PRELOAD' in os.environ:
     del os.environ['LD_PRELOAD']
 
-import argparse
-import casa_system_defaults
-from casa_system_defaults import casa
+def __init_config(config,flags,args):
+    if flags.datapath is not None:
+        datap = list(map(os.path.abspath,filter(os.path.isdir,list(flags.datapath.split(':')))))
+        config.datapath = datap
+    if flags.logfile is not None:
+        config.logfile = flags.logfile if flags.logfile.startswith("/") else os.path.realpath(os.path.join('.',flags.logfile))
 
-__pylib = os.path.dirname(os.path.realpath(casa_system_defaults.__file__))
-__init_scripts = [
-    "init_begin_startup.py",
-    "init_system.py",
-    "init_telemetry.py",
-    "init_logger.py",
-    "init_user_pre.py",
-    "init_dbus.py",
-    "init_tools.py",
-    "init_tasks.py",
-    "init_funcs.py",
-    "init_pipeline.py",
-    "init_mpi.py",
-    "init_docs.py",
-    "init_user_post.py",
-    "init_crashrpt.py",
-    "init_end_startup.py",
-    "init_welcome.py",
-]
+    config.flags = flags
+    config.args = args
+ 
+###
+### this will be used by inp/go which are introduced in init_subparam
+###
+casa_inp_go_state = { 'last': None }
 
-##
-## this is filled via register_builtin (from casa_builtin.py)
-##
-casa_builtins = { }
+###
+### this will be used by register_builtin for making casa builtins immutable
+###
+casa_builtin_state = { }
 
 ##
 ## this is filled via add_shutdown_hook (from casa_shutdown.py)
@@ -43,12 +34,42 @@ casa_builtins = { }
 casa_shutdown_handlers = [ ]
 
 ##
-## final interactive exit status...
-## runs using "-c ..." exit from init_welcome.py
+## filled when -c <args> is used
 ##
-startup_scripts = filter( os.path.isfile, map(lambda f: __pylib + '/' + f, __init_scripts ) )
+casa_eval_status = { 'code': 0, 'desc': 0 }
 
-from init_welcome_helpers import immediate_exit_with_handlers
+import casashell
+__pylib = os.path.dirname(os.path.realpath(casashell.__file__)) + '/private/' 
+__init_scripts = [ "init_system.py",
+                 "load_tasks.py",
+                 "load_tools.py",
+                 "init_subparam.py",
+                 "init_doc.py",
+                 "init_welcome.py",
+                ]
+
+startup_scripts = list(filter( os.path.isfile, [__pylib + '/' + f for f in __init_scripts] ))
+
+from casashell.private import config
+from argparse import Namespace
+casa_config_master = config
+args = []
+flags = Namespace(logfile = None, 
+                  log2term = False, 
+                  nologger = False, 
+                  nologfile = False, 
+                  nogui = False,
+                  prompt = 'NoColor',
+                  trace = False,
+                  pipeline = False,
+                  agg = False,
+                  ipython_log = False,
+                  datapath = None,
+                  crash_report = True,
+                  telemetry = False,
+                  execute = [])
+
+__init_config(casa_config_master,flags,args)
 
 class CasapyKernel(IPythonKernel):
     implementation = 'Casapy'
@@ -66,7 +87,8 @@ class CasapyKernel(IPythonKernel):
            self.do_execute('%run -i {}'.format(i), True, False, {}, False)
         wrappers = os.path.dirname(os.path.realpath(__file__)) + '/tasks_wrapped.py'
         self.do_execute('%run -i {}'.format(wrappers), True, False, {}, False) 
-        self.logfile = open(casa['files']['logfile'], 'r')
+        import casashell.private.config as config
+        self.logfile = open(config.logfile, 'r')
     
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):

@@ -18,7 +18,7 @@ IncludeCmd: no
 %setup
   # Add jupyter-casa tree to container
   mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
-  cp -r jupyter python asap.patch casacore.patch ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+  cp -r jupyter python ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
 
 %post
     # Setup enviroment
@@ -29,10 +29,10 @@ IncludeCmd: no
     #subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
     yum upgrade -y
     rpm --import http://casa.nrao.edu/download/RPM-GPG-KEY-casa http://casa.nrao.edu/download/repo/el7/RPM-GPG-KEY-redhat-release http://casa.nrao.edu/download/repo/el7/RPM-GPG-KEY-EPEL
-    yum install -y casa-toolset-3 
+    yum install -y casa-toolset-3 casa02-dbus-cpp-devel
     yum install -y less libicu-devel boost-devel
     #yum install -y qt-devel # Maybe not needed, pulls in about 100MB of dependencies
-    yum install -y qt-config perl-File-Slurp qwt-devel dbus-c++-devel
+    yum install -y qt-config perl-File-Slurp qwt-devel 
 
     # install jupyter
     . /opt/rh/rh-python36/enable

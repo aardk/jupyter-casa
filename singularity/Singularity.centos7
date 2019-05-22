@@ -23,21 +23,22 @@ IncludeCmd: no
 %post
     # Setup enviroment
     export LC_ALL=C
+    rpm --import http://casa.nrao.edu/download/RPM-GPG-KEY-casa http://casa.nrao.edu/download/repo/el7/RPM-GPG-KEY-redhat-release http://casa.nrao.edu/download/repo/el7/RPM-GPG-KEY-EPEL
     yum-config-manager --add-repo http://casa.nrao.edu/download/repo/el7/x86_64
     yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     yum install -y centos-release-scl
+    yum install -y deltarpm
     #subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
     yum upgrade -y
-    rpm --import http://casa.nrao.edu/download/RPM-GPG-KEY-casa http://casa.nrao.edu/download/repo/el7/RPM-GPG-KEY-redhat-release http://casa.nrao.edu/download/repo/el7/RPM-GPG-KEY-EPEL
     yum install -y casa-toolset-3 casa02-dbus-cpp-devel
-    yum install -y less libicu-devel boost-devel
+    yum install -y less libicu-devel boost-devel casa02-grpc-devel
     #yum install -y qt-devel # Maybe not needed, pulls in about 100MB of dependencies
     yum install -y qt-config perl-File-Slurp qwt-devel 
 
     # install jupyter
     . /opt/rh/rh-python36/enable
     . /opt/rh/devtoolset-4/enable
-    pip3 install --upgrade pip3
+    pip3 install --upgrade pip
     pip3 install matplotlib notebook widgetsnbextension
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
     
@@ -52,25 +53,27 @@ IncludeCmd: no
     mkdir -p $workDir
     cd $workDir
     git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casatools.git
-    rm -rf casatools/.git # cleanup git, saves ~600MB in total
+    #rm -rf casatools/.git # cleanup git, saves ~600MB in total
     git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casatasks.git
-    rm -rf casatasks/.git # cleanup git, saves ~600MB in total
+    #rm -rf casatasks/.git # cleanup git, saves ~600MB in total
     git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casashell.git
-    rm -rf casashell/.git # cleanup git, saves ~600MB in total
+    #rm -rf casashell/.git # cleanup git, saves ~600MB in total
     git clone --recursive https://open-bitbucket.nrao.edu/scm/casa/CASAplotms.git
-    rm -rf CASAplotms/.git # cleanup git, saves ~600MB in total
+    #rm -rf CASAplotms/.git # cleanup git, saves ~600MB in total
     git clone --recursive https://open-bitbucket.nrao.edu/scm/casa/CASAviewer.git
-    rm -rf CASAviewer/.git # cleanup git, saves ~600MB in total
+    #rm -rf CASAviewer/.git # cleanup git, saves ~600MB in total
 
     # Build casa tools
     cd $workDir/casatools
     scripts/gcw-pick
     autoconf
     ./configure
-    ./setup.py genmake
-    # NB: CASA gets its cflags from sysconfig.get_config_var('CFLAGS') in setup.py
-    make -j$HOST_CPU_CORES
-    mv build/lib.linux-x86_64-3.6/casatools /opt/rh/rh-python36/root/usr/lib/python3.6/site-packages 
+    #./setup.py genmake
+    ## NB: CASA gets its cflags from sysconfig.get_config_var('CFLAGS') in setup.py
+    #make -j$HOST_CPU_CORES
+    #mv build/lib.linux-x86_64-3.6/casatools /opt/rh/rh-python36/root/usr/lib/python3.6/site-packages 
+    ./setup.py build
+    ./setup.py install
 
     # Build casa tasks
     cd $workDir/casatasks
@@ -78,11 +81,14 @@ IncludeCmd: no
     ./setup.py install 
     
     # Build plotms
+    cd $workDir/CASAplotms
+    export PATH=$PATH:/opt/casa/02/bin
     scripts/adjust
     qmake-qt4
-    make
+    make CXXFLAGS="-I/opt/casa/03/include/ -std=gnu++11"
 
     # Build viewer
+    cd $workDir/CASAviewer
     scripts/adjust
     qmake-qt4
     make

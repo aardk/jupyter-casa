@@ -17,7 +17,7 @@ IncludeCmd: no
 %setup
   # Add jupyter-casa tree to container
   mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
-  cp -r jupyter python asap.patch casacore.patch ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+  cp -r jupyter python ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
 
 %post
     # Setup enviroment
@@ -35,11 +35,11 @@ IncludeCmd: no
     apt-get install -y doxygen swig libgsl-dev
     apt-get install -y automake autoconf libtool autotools-dev rsync libxerces-c-dev
     # Build issues using newer gcc
-    apt-get install -y gcc-5 g++-5 gfortran-5
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50
-    update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-5 50
-    apt-get clean
+    #apt-get install -y gcc-5 g++-5 gfortran-5
+    #update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50
+    #update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50
+    #update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-5 50
+    #apt-get clean
     # We need an older version of libeigen3 for libsakura
     #wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb
     #dpkg -i libeigen3-dev_3.2.0-8_all.deb
@@ -70,22 +70,22 @@ IncludeCmd: no
     rm -rf rpfits*
     
     # Dependencies - Googletest
-    wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
-    tar zxvf release-1.7.0.tar.gz
-    rm release-1.7.0.tar.gz
+    #wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
+    #tar zxvf release-1.7.0.tar.gz
+    #rm release-1.7.0.tar.gz
   
     # Dependencies - LIBSAKURA
-    git clone https://github.com/aardk/libsakura
-    ln -s /googletest-release-1.7.0 libsakura/gtest
-    mkdir libsakura/build
-    cd libsakura/build
+    #git clone https://github.com/aardk/libsakura
+    #ln -s /googletest-release-1.7.0 libsakura/gtest
+    #mkdir libsakura/build
+    #cd libsakura/build
     # cmake -DSIMD_ARCH=NATIVE ..
-    cmake -DSIMD_ARCH=SSE4 .. # For distribution purposes
-    make
-    make apidoc
-    make install
-    cd ../..
-    rm -rf libsakura
+    #cmake -DSIMD_ARCH=SSE4 .. # For distribution purposes
+    #make
+    #make apidoc
+    #make install
+    #cd ../..
+    #rm -rf libsakura
     
     # casa data needs git lfs support
     export LFSVERSION=v2.7.2
@@ -108,73 +108,58 @@ IncludeCmd: no
     mkdir -p $workDir
     cd $workDir
     git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casatools.git
-    git submodule update --init casacore
-    git clone --no-checkout https://open-bitbucket.nrao.edu/scm/casa/casa-data.git $workDir/data
-    cd data
-    git show HEAD:distro | bash
-    # cleanup git, saves ~600MB
-    rm -rf .git
+    #rm -rf casatools/.git # cleanup git, saves ~600MB in total
+    git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casatasks.git
+    #rm -rf casatasks/.git # cleanup git, saves ~600MB in total
+    git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casashell.git
+    #rm -rf casashell/.git # cleanup git, saves ~600MB in total
+    git clone --recursive https://open-bitbucket.nrao.edu/scm/casa/CASAplotms.git
+    #rm -rf CASAplotms/.git # cleanup git, saves ~600MB in total
+    git clone --recursive https://open-bitbucket.nrao.edu/scm/casa/CASAviewer.git
+    #rm -rf CASAviewer/.git # cleanup git, saves ~600MB in total
 
-   # Build casa tools
+    # Build casa tools
     cd $workDir/casatools
     scripts/gcw-pick
     autoconf
     PYTHON_VERSION=3.6 ./configure
+    mkdir -p /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/
     ln -s /usr/bin/g++ /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/g++
     ln -s /usr/bin/gcc /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/gcc
+    # Third party dependencies generate harmless warnings but -Werror makes the build fail
+    sed -ie "s/-Werror//" build/grpc.linux-x86_64-3.6/Makefile
     ./setup.py genmake
     make -j$HOST_CPU_CORES
     # CASA gets its cflags from sysconfig.get_config_var('CFLAGS'), on ubuntu this sets the
     # compiler flag -Werror=format-security which will make CASA not build, we need to patch
     # setup.py so that this flag is filtered out
 
-    # build casa code
-    mkdir $workDir/code/build
-    cd $workDir/code/build
-    mkdir gtest breakpad
-    # For some reason automatic download of googletest and breakpad fails on my system
-    cd gtest
-    wget https://svn.cv.nrao.edu/casa/devel/googletest/googletest-release-1.7.0.tar.gz
-    tar zxvf googletest-release-1.7.0.tar.gz
-    cd ../breakpad
-    wget https://casa.nrao.edu/download/devel/breakpad/breakpad-from-google-180213-patch3.tgz:
-    tar zxvf breakpad-from-google-180213-patch3.tgz
-    cd ..
-    cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DINTERACTIVE_ITERATION=1 -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH 2>&1 | tee cmake.log
-    make -j$HOST_CPU_CORES
-    cd $workDir
-    rm -rf code/build 
+    # Build casa tasks
+    cd $workDir/casatasks
+    ./setup.py build
+    ./setup.py install 
     
-    # build gcwrap
-    mkdir $workDir/gcwrap/build
-    cd $workDir/gcwrap/build
-    cmake .. -Darch=$CASA_ARCH -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DPYTHON_LIBNAME=2.7 -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DINTERACTIVE_ITERATION=1 2>&1 | tee cmake.log
-    make -j$HOST_CPU_CORES
-    cd $workDir
-    rm -rf gcWrap
- 
-    # Build asap
-    cd $workDir/casa-asap
-    patch -p1 </usr/local/jupyter-casa/asap.patch
-    mkdir $workDir/casa-asap/build
-    cd $workDir/casa-asap/build
-    cmake .. -Darch=$CASA_ARCH -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH -DPYTHON_LIBNAME=2.7 -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE 2>&1 | tee cmake.log
-    make -j$HOST_CPU_CORES
-    cd $workDir
-    rm -rf casa-asap
-    rm -rf code
+    # Build plotms
+    cd $workDir/CASAplotms
+    export PATH=$PATH:/opt/casa/02/bin
+    scripts/adjust
+    qmake-qt4
+    make CXXFLAGS="-I/opt/casa/03/include/ -std=gnu++11"
+
+    # Build viewer
+    cd $workDir/CASAviewer
+    scripts/adjust
+    qmake-qt4
+    make
+    
+    # Build casa shell
+    cd $workDir/casashell
+    ./setup.py build
+    ./setup.py install
 
     # Install jupyter casa wrapper
     cd /usr/local
-    mkdir -p /usr/local/lib/python2.7/dist-packages
-    mv jupyter-casa/python/start_casa /usr/local/lib/python2.7/dist-packages/
-    cp -r jupyter-casa/jupyter /usr/local/share/
-    # Copy fixed casa tasked
-    cp jupyter-casa/python/casa/TablePlotTkAgg.py $workDir/linux64/lib/python2.7
-    cp jupyter-casa/python/casa/task_setjy.py $workDir/linux64/lib/python2.7
+    DEST=/opt/rh/rh-python36/root/usr/
+    mv jupyter-casa/python/start_casa $DEST/lib/python3.6/site-packages
+    cp -r jupyter-casa/jupyter $DEST/share/
     rm -rf jupyter-casa
-
-    # Some cleanup TODO: We could remove much more
-    apt-get autoremove -y
-    apt-get clean
-    rm -rf .git

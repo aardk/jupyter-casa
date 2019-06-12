@@ -1,3 +1,25 @@
+diff --git a/src/PlotHelper.h b/src/PlotHelper.h
+index 314daca..563df3b 100644
+--- a/src/PlotHelper.h
++++ b/src/PlotHelper.h
+@@ -62,7 +62,7 @@ public:
+   /**
+    * Get Pixel position of a row in the scantable
+    **/
+-  vector<double> getGridPixel(const int whichrow=0);
++  std::vector<double> getGridPixel(const int whichrow=0);
+ 
+   /**
+    * Get the reference direction of grid coordinate (grid center)
+@@ -72,7 +72,7 @@ public:
+   /**
+    * Get the cell size (>0) of the grid coordinate (in radian)
+    **/
+-  vector<double> getGridCellVal();
++  std::vector<double> getGridCellVal();
+ 
+ 
+ private:
 diff --git a/src/STApplyCal.h b/src/STApplyCal.h
 index 2c8134f..0c46a95 100644
 --- a/src/STApplyCal.h
@@ -62,6 +84,73 @@ index 9b315ce..0538ee6 100644
    Float gA = C::pi * D * D / 4.0;
    return (2.0 * 1.0e19 * kb / etaAp / gA);
  }
+diff --git a/src/STBaselineTable.h b/src/STBaselineTable.h
+index 8a42c2f..48811b4 100644
+--- a/src/STBaselineTable.h
++++ b/src/STBaselineTable.h
+@@ -63,33 +63,33 @@ public:
+ 		  int freqid, casacore::Double time, 
+ 		  bool apply, 
+ 		  STBaselineFunc::FuncName ftype, 
+-		  vector<int> fpar, 
+-		  vector<float> ffpar, 
++		  std::vector<int> fpar, 
++		  std::vector<float> ffpar, 
+ 		  casacore::Vector<casacore::uInt> mask,
+-		  vector<float> res,
++		  std::vector<float> res,
+ 		  float rms,
+ 		  int nchan, 
+ 		  float cthres,
+ 		  int citer, 
+ 		  float lfthres, 
+ 		  int lfavg, 
+-		  vector<int> lfedge);
++		  std::vector<int> lfedge);
+   void appenddata(int scanno, int cycleno, 
+ 		  int beamno, int ifno, int polno, 
+ 		  int freqid, casacore::Double time, 
+ 		  bool apply, 
+ 		  STBaselineFunc::FuncName ftype, 
+ 		  int fpar, 
+-		  vector<float> ffpar, 
++		  std::vector<float> ffpar, 
+ 		  casacore::Vector<casacore::uInt> mask,
+-		  vector<float> res,
++		  std::vector<float> res,
+ 		  float rms,
+ 		  int nchan, 
+ 		  float cthres,
+ 		  int citer, 
+ 		  float lfthres, 
+ 		  int lfavg, 
+-		  vector<int> lfedge);
++		  std::vector<int> lfedge);
+   void appenddata(casacore::uInt scanno, casacore::uInt cycleno, 
+                   casacore::uInt beamno, casacore::uInt ifno, casacore::uInt polno, 
+                   casacore::uInt freqid, casacore::Double time, 
+diff --git a/src/STCalTsys.h b/src/STCalTsys.h
+index 29fabca..5b792c2 100644
+--- a/src/STCalTsys.h
++++ b/src/STCalTsys.h
+@@ -38,7 +38,7 @@ namespace asap {
+  */
+ class STCalTsys : public STCalibration {
+ public:
+-  STCalTsys(casacore::CountedPtr<Scantable> &s, vector<int> &iflist);
++  STCalTsys(casacore::CountedPtr<Scantable> &s, std::vector<int> &iflist);
+   STCalTsys(casacore::CountedPtr<Scantable> &s, casacore::Record &iflist, bool average=false);
+ 
+   ~STCalTsys() {;}
+@@ -51,7 +51,7 @@ private:
+ 			  const casacore::Vector<casacore::Float> &any_data,
+ 			  const casacore::Vector<casacore::uChar> &channel_flag);
+ 
+-  vector<int> iflist_;
++  std::vector<int> iflist_;
+   casacore::Record tsysspw_;
+   bool do_average_;
+ };
 diff --git a/src/STLineFinder.h b/src/STLineFinder.h
 index 509a24a..be75172 100644
 --- a/src/STLineFinder.h
@@ -84,19 +173,6 @@ index 509a24a..be75172 100644
         std::pair<int,int> line1;           // range of the first line
                                             // start channel and stop+1
     public:
-diff --git a/src/Scantable.h b/src/Scantable.h
-index 1ae132d..e6100fb 100644
---- a/src/Scantable.h
-+++ b/src/Scantable.h
-@@ -994,7 +994,7 @@ private:
-  std::vector<float> doSubtractBaseline(std::vector<float>& spec, std::vector<bool>& mask, const STBaselineFunc::FuncName ftype, std::vector<int>& fpar, std::vector<float>& params, float&rms, std::vector<bool>& finalmask, float clipth, int clipn, bool uself, int irow, float lfth, std::vector<int>& lfedge, int lfavg);
- 
-  // storage of cubic spline model for various number of channels
-- map<size_t, vector< vector<double> > > cubicSplineModelPool_;
-+ std::map<size_t, std::vector< std::vector<double> > > cubicSplineModelPool_;
- 
- };
- } // namespace
 diff --git a/src/STMath.cpp b/src/STMath.cpp
 index 057b88f..19b2d35 100644
 --- a/src/STMath.cpp
@@ -111,4 +187,82 @@ index 057b88f..19b2d35 100644
        CustomTableExprNode myExpr(myNodeRep);
        Table basesubt = tin(myExpr);
  #else
-
+diff --git a/src/STMath.h b/src/STMath.h
+index b0139d8..11f19b4 100644
+--- a/src/STMath.h
++++ b/src/STMath.h
+@@ -417,10 +417,10 @@ private:
+                     const casacore::Vector<casacore::uInt> &rows ) ;
+   void calibrateAPEXFS( casacore::CountedPtr<Scantable> &sig,
+                         casacore::CountedPtr<Scantable> &ref,
+-                        const vector< casacore::CountedPtr<Scantable> > &on,
+-                        const vector< casacore::CountedPtr<Scantable> > &sky,
+-                        const vector< casacore::CountedPtr<Scantable> > &hot,
+-                        const vector< casacore::CountedPtr<Scantable> > &cold,
++                        const std::vector< casacore::CountedPtr<Scantable> > &on,
++                        const std::vector< casacore::CountedPtr<Scantable> > &sky,
++                        const std::vector< casacore::CountedPtr<Scantable> > &hot,
++                        const std::vector< casacore::CountedPtr<Scantable> > &cold,
+                         const casacore::Vector<casacore::uInt> &rows ) ;
+   void copyRows( casacore::Table &out,
+                  const casacore::Table &in,
+@@ -431,7 +431,7 @@ private:
+                  casacore::Bool copyFlagtra=true,
+                  casacore::Bool copyTsys=true ) ;
+   casacore::CountedPtr<Scantable> averageWithinSession( casacore::CountedPtr<Scantable> &s,
+-                                                    vector<bool> &mask,
++                                                    std::vector<bool> &mask,
+                                                     string weight ) ;
+ 
+   bool insitu_;
+diff --git a/src/Scantable.h b/src/Scantable.h
+index 1ae132d..4bc55c2 100644
+--- a/src/Scantable.h
++++ b/src/Scantable.h
+@@ -435,12 +435,12 @@ public:
+   void setRestFrequencies(vector<double> rf, const vector<std::string>& name = "",
+                           const std::string& = "Hz");
+   ***/
+-  void setRestFrequencies(vector<double> rf,
+-                          const vector<std::string>& name = vector<std::string>(1,""),
++  void setRestFrequencies(std::vector<double> rf,
++                          const std::vector<std::string>& name = std::vector<std::string>(1,""),
+                           const std::string& = "Hz");
+ 
+   //void setRestFrequencies(const std::string& name);
+-  void setRestFrequencies(const vector<std::string>& name);
++  void setRestFrequencies(const std::vector<std::string>& name);
+ 
+   void shift(int npix);
+ 
+@@ -994,7 +994,7 @@ private:
+  std::vector<float> doSubtractBaseline(std::vector<float>& spec, std::vector<bool>& mask, const STBaselineFunc::FuncName ftype, std::vector<int>& fpar, std::vector<float>& params, float&rms, std::vector<bool>& finalmask, float clipth, int clipn, bool uself, int irow, float lfth, std::vector<int>& lfedge, int lfavg);
+ 
+  // storage of cubic spline model for various number of channels
+- map<size_t, vector< vector<double> > > cubicSplineModelPool_;
++ std::map<size_t, std::vector< std::vector<double> > > cubicSplineModelPool_;
+ 
+ };
+ } // namespace
+diff --git a/src/ScantableWrapper.h b/src/ScantableWrapper.h
+index 0506672..7d796d1 100644
+--- a/src/ScantableWrapper.h
++++ b/src/ScantableWrapper.h
+@@ -208,7 +208,7 @@ public:
+                           const std::string& unit)
+     { table_->setRestFrequencies(rf, name, unit); }
+ **/
+-  void setRestFrequencies(vector<double> rf, const vector<std::string>& name,
++  void setRestFrequencies(std::vector<double> rf, const std::vector<std::string>& name,
+                           const std::string& unit)
+     { table_->setRestFrequencies(rf, name, unit); }
+ 
+@@ -276,7 +276,7 @@ public:
+   std::string getAntennaName() const
+     { return table_->getAntennaName(); }
+ 
+-  int checkScanInfo(const vector<int>& scanlist) const
++  int checkScanInfo(const std::vector<int>& scanlist) const
+     { return table_->checkScanInfo(scanlist); }
+  
+   std::vector<double> getDirectionVector(int whichrow) const

@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 CMD ["jupyter", "notebook"]
-RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic multiverse" >> /etc/apt/sources.list \
-    && echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic-updates multiverse" >> /etc/apt/sources.list \
+RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic main restricted universe multiverse" > /etc/apt/sources.list \
+    && echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list \
     && apt-get update && apt-get install -y apt-utils debconf-utils && apt-get -y upgrade && apt-get clean
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,7 +12,7 @@ RUN apt-get install -y python2.7 python-dev python-numpy python-scipy python-pip
                        wcslib-dev libboost-program-options-dev libboost-filesystem-dev \
                        libboost-system-dev libboost-python-dev libboost-thread-dev libboost-regex-dev \
                        libqt4-dev pgplot5 openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev \
-                       libqwt-dev libsqlite3-dev liblog4cxx-dev doxygen swig libgsl-dev \
+                       libqwt-dev libsqlite3-dev liblog4cxx-dev doxygen swig libgsl-dev curl\
     && apt-get clean
 
 # Libgsl from 16.04 is too old for CASA, get the version from 18.04
@@ -76,7 +76,7 @@ RUN mkdir -p gitlfs-${LFSVERSION} \
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \
     CASA_ARCH=linux64 \
-    CASA_BRANCH=release/5.4.1 \
+    CASA_BRANCH=release/5.5.0 \
     workDir=/usr/local/casa \
     CASAPATH="$workDir $CASA_ARCH"
 
@@ -106,15 +106,6 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     # build casa code
     && mkdir $workDir/code/build \
     && cd $workDir/code/build \
-    && mkdir gtest breakpad \
-    && cd gtest \
-    # For some reason automatic download of googletest and breakpad fails on my system
-    && wget https://svn.cv.nrao.edu/casa/devel/googletest/googletest-release-1.7.0.tar.gz \
-    && tar zxvf googletest-release-1.7.0.tar.gz \
-    && cd ../breakpad \
-    && wget https://casa.nrao.edu/download/devel/breakpad/breakpad-from-google-180213-patch2.tgz \
-    && tar zxvf breakpad-from-google-180213-patch2.tgz \
-    && cd .. \
     && cmake .. -DCMAKE_BUILD_TYPE=$CASA_BUILD_TYPE -DINTERACTIVE_ITERATION=1 -DCMAKE_INSTALL_PREFIX=$workDir/$CASA_ARCH \
     && make -j$HOST_CPU_CORES \
     && cd $workDir \

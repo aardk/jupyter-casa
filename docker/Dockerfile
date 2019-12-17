@@ -76,7 +76,7 @@ RUN mkdir -p gitlfs-${LFSVERSION} \
 ENV HOST_CPU_CORES=8 \
     CASA_BUILD_TYPE=Release \
     CASA_ARCH=linux64 \
-    CASA_BRANCH=release/5.5.0 \
+    CASA_BRANCH=release/pipeline/5.6.3 \
     workDir=/usr/local/casa \
     CASAPATH="$workDir $CASA_ARCH"
 

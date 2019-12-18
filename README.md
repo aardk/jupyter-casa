@@ -22,13 +22,13 @@ most recent (I)python, matplotlib, etc. Note that this version of CASA can only 
 
 Installation is as simple as executing:
 `
-docker pull penngwyn/jupytercasa:docker-casa-56
+docker pull penngwyn/jupytercasa
 `
 
 Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which may be a bit easier to use, it can be downloaded by executing:
 
 `
-singularity pull --name jupyter-casa.simg shub://aardk/jupyter-casa:docker
+singularity pull --name jupyter-casa.simg shub://aardk/jupyter-casa:docker-casa-56
 `
 
 ## Usage

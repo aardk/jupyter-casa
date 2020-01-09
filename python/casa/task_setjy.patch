@@ -1,0 +1,10 @@
+4a5
+> import subprocess
+453,454c454,457
+<             sys.stdout.flush()
+<             os.system('cd ' + path + ';ls -d ' + modpat)
+---
+>             #sys.stdout.flush()
+>             #os.system('cd ' + path + ';ls -d ' + modpat)
+>             cmd = 'cd ' + path + ';ls -d ' + modpat
+>             print(subprocess.check_output(cmd, shell=True).decode("utf-8"))

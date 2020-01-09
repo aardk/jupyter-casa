@@ -7,17 +7,14 @@ IncludeCmd: no
     jupyter notebook
 
 %environment
-  export PYTHONPATH="/usr/local/lib/python3.6/dist-packages:/usr/local/casa/linux64/lib/python3.6" 
-  export LD_LIBRARY_PATH="/usr/local/casa/linux64/lib"
-  export CASAPATH="/usr/local/casa/ linux64"
-  export PATH="/usr/local/casa/linux64/bin:$PATH"
-  export QT_X11_NO_MITSHM=1
-  unset XDG_RUNTIME_DIR 
+    export PYTHONPATH="/usr/local/lib/python3.6/dist-packages" 
+    export QT_X11_NO_MITSHM=1
+    unset XDG_RUNTIME_DIR 
 
 %setup
-  # Add jupyter-casa tree to container
-  mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
-  cp -r jupyter python ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+    # Add jupyter-casa tree to container
+    mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+    cp -r jupyter python ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
 
 %post
     # Setup enviroment
@@ -26,140 +23,28 @@ IncludeCmd: no
 
     export LC_ALL=C
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y
-    apt-get install -y python3 python3-dev python3-numpy python3-scipy python3-pip python3-nose python3-tk python3-dbus\
-                       build-essential gfortran git wget cmake flex bison g++ xvfb
-    apt-get install -y libcfitsio-dev libreadline-dev libncurses5-dev libhdf5-serial-dev libpython3.6-dev libboost-python-dev\
-                       libblas-dev liblapacke-dev libfftw3-dev libcfitsio-dev wcslib-dev
-    apt-get install -y libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libboost-python-dev libboost-thread-dev libboost-regex-dev
-    apt-get install -y libqt4-dev pgplot5 openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev libqwt-dev libsqlite3-dev liblog4cxx-dev 
-    apt-get install -y doxygen swig libgsl-dev
-    apt-get install -y automake autoconf libtool autotools-dev rsync libxerces-c-dev
-    # Build issues using newer gcc
-    #apt-get install -y gcc-5 g++-5 gfortran-5
-    #update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 50
-    #update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50
-    #update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-5 50
-    #apt-get clean
-    # We need an older version of libeigen3 for libsakura
-    #wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb
-    #dpkg -i libeigen3-dev_3.2.0-8_all.deb
-    #rm libeigen3-dev_3.2.0-8_all.deb
-    # Default libxerces in 18.04 is too new for casa code, use older version
-    #wget http://launchpadlibrarian.net/344856440/libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
-    #wget http://launchpadlibrarian.net/344856431/libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
-    #dpkg -i libxerces-c3.1_3.1.4+debian-2build2_amd64.deb
-    #dpkg -i libxerces-c-dev_3.1.4+debian-2build2_amd64.deb
-    # Libgsl from 16.04 is too old for CASA, get the version from 18.04
-    #wget http://nl.archive.ubuntu.com/ubuntu/pool/universe/g/gsl/libgsl23_2.4+dfsg-6_amd64.deb
-    #wget http://nl.archive.ubuntu.com/ubuntu/pool/universe/g/gsl/libgslcblas0_2.4+dfsg-6_amd64.deb
-    #wget http://nl.archive.ubuntu.com/ubuntu/pool/universe/g/gsl/libgsl-dev_2.4+dfsg-6_amd64.deb
-    #dpkg -i libgslcblas0_2.4+dfsg-6_amd64.deb
-    #dpkg -i libgsl23_2.4+dfsg-6_amd64.deb
-    #dpkg -i libgsl-dev_2.4+dfsg-6_amd64.deb
-    #rm libgsl*2.4+dfsg-6_amd64.deb
-    # install jupyter
-    pip3 install matplotlib notebook widgetsnbextension
+    apt-get install -y python3 python3-dev python3-pip libgfortran3 wget
+    apt-get install -y iproute2 lsof
+    pip3 install -U pip
+    /usr/local/bin/pip install matplotlib notebook widgetsnbextension
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
-    
-    # Dependencies - RPFITS
-    wget ftp://ftp.atnf.csiro.au/pub/software/rpfits/rpfits.tar.gz
-    tar zxvf rpfits.tar.gz  
-    cd rpfits/linux64
-    make install
-    cd ../..
-    rm -rf rpfits*
-    
-    # Dependencies - Googletest
-    #wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
-    #tar zxvf release-1.7.0.tar.gz
-    #rm release-1.7.0.tar.gz
-  
-    # Dependencies - LIBSAKURA
-    #git clone https://github.com/aardk/libsakura
-    #ln -s /googletest-release-1.7.0 libsakura/gtest
-    #mkdir libsakura/build
-    #cd libsakura/build
-    # cmake -DSIMD_ARCH=NATIVE ..
-    #cmake -DSIMD_ARCH=SSE4 .. # For distribution purposes
-    #make
-    #make apidoc
-    #make install
-    #cd ../..
-    #rm -rf libsakura
-    
-    # casa data needs git lfs support
-    export LFSVERSION=v2.7.2
-    mkdir -p gitlfs-${LFSVERSION}
-    cd gitlfs-${LFSVERSION}
-    wget https://github.com/git-lfs/git-lfs/releases/download/${LFSVERSION}/git-lfs-linux-amd64-${LFSVERSION}.tar.gz
-    tar zxvf git-lfs-linux-amd64-${LFSVERSION}.tar.gz
-    ./install.sh
-    cd ..
-    rm -rf gitlfs-${LFSVERSION}
-
-    # Build casa
-    export HOST_CPU_CORES=8
-    export CASA_BUILD_TYPE=Release
-    export CASA_ARCH=linux64
-    export CASA_BRANCH=master
-    export workDir=/usr/local/casa
-    export CASAPATH="$workDir $CASA_ARCH"
-
-    mkdir -p $workDir
-    cd $workDir
-    git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casatools.git
-    #rm -rf casatools/.git # cleanup git, saves ~600MB in total
-    git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casatasks.git
-    #rm -rf casatasks/.git # cleanup git, saves ~600MB in total
-    git clone -b $CASA_BRANCH --recursive https://open-bitbucket.nrao.edu/scm/casa/casashell.git
-    #rm -rf casashell/.git # cleanup git, saves ~600MB in total
-    git clone --recursive https://open-bitbucket.nrao.edu/scm/casa/CASAplotms.git
-    #rm -rf CASAplotms/.git # cleanup git, saves ~600MB in total
-    git clone --recursive https://open-bitbucket.nrao.edu/scm/casa/CASAviewer.git
-    #rm -rf CASAviewer/.git # cleanup git, saves ~600MB in total
-
-    # Build casa tools
-    cd $workDir/casatools
-    scripts/gcw-pick
-    autoconf
-    PYTHON_VERSION=3.6 ./configure
-    mkdir -p /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/
-    ln -s /usr/bin/g++ /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/g++
-    ln -s /usr/bin/gcc /usr/local/casa/casatools/build/compilers.linux-x86_64-3.6/gcc
-    # Third party dependencies generate harmless warnings but -Werror makes the build fail
-    sed -ie "s/-Werror//" build/grpc.linux-x86_64-3.6/Makefile
-    ./setup.py genmake
-    make -j$HOST_CPU_CORES
-    # CASA gets its cflags from sysconfig.get_config_var('CFLAGS'), on ubuntu this sets the
-    # compiler flag -Werror=format-security which will make CASA not build, we need to patch
-    # setup.py so that this flag is filtered out
-
-    # Build casa tasks
-    cd $workDir/casatasks
-    ./setup.py build
-    ./setup.py install 
-    
-    # Build plotms
-    cd $workDir/CASAplotms
-    export PATH=$PATH:/opt/casa/02/bin
-    scripts/adjust
-    qmake-qt4
-    make CXXFLAGS="-I/opt/casa/03/include/ -std=gnu++11"
-
-    # Build viewer
-    cd $workDir/CASAviewer
-    scripts/adjust
-    qmake-qt4
-    make
-    
-    # Build casa shell
-    cd $workDir/casashell
-    ./setup.py build
-    ./setup.py install
-
-    # Install jupyter casa wrapper
+    # Install casa
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell
+    # carta
     cd /usr/local
-    DEST=/opt/rh/rh-python36/root/usr/
-    mv jupyter-casa/python/start_casa $DEST/lib/python3.6/site-packages
-    cp -r jupyter-casa/jupyter $DEST/share/
-    rm -rf jupyter-casa
+    wget https://github.com/CARTAvis/carta/releases/download/v1.2.2/CARTA-v1.2.2-remote.tgz
+    apt-get install -y libnss3 libgdk-pixbuf2.0-0 libgtk-3-0 #libx11-xcb1 libxss1 libasound2
+    tar zxf CARTA-v1.2.2-remote.tgz
+    # Jupyter-casa
+    cd /usr/local
+    mkdir -p /usr/local/lib/python3.6/dist-packages
+    mv jupyter-casa/python/start_casa /usr/local/lib/python3.6/dist-packages/
+    cp -r jupyter-casa/jupyter /usr/local/share/
+    # Modified casa tasks for Jupyter
+    cd /usr/local
+    patch lib/python3.6/dist-packages/casatasks/private/task_setjy.py jupyter-casa/python/casa/task_setjy.patch
+    #cp jupyter-casa/python/casa/task_setjy.py $workDir/linux64/lib/python2.7
+    #cp jupyter-casa/python/casa/casa_stack_manip.py $workDir/linux64/lib/python2.7
+    #rm -rf jupyter-casa

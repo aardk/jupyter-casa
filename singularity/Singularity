@@ -54,6 +54,7 @@ IncludeCmd: no
     # install jupyter
     pip install --upgrade pip
     /usr/local/bin/pip install matplotlib notebook widgetsnbextension
+    /usr/local/bin/pip install pyfits astropy
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
     
     # Dependencies - RPFITS

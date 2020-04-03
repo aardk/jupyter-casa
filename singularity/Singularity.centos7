@@ -39,7 +39,7 @@ IncludeCmd: no
     . /opt/rh/rh-python36/enable
     . /opt/rh/devtoolset-4/enable
     pip3 install --upgrade pip
-    pip3 install matplotlib notebook widgetsnbextension
+    pip3 install matplotlib astropy notebook widgetsnbextension
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
     
     # Build casa

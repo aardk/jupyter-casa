@@ -34,6 +34,7 @@ RUN wget http://launchpadlibrarian.net/165141962/libeigen3-dev_3.2.0-8_all.deb \
 RUN apt-get install -y gfortran build-essential python-numpy-dev \
     && pip install --upgrade pip \
     && /usr/local/bin/pip install matplotlib notebook widgetsnbextension \
+    && /usr/local/bin/pip install astropy\ 
     # Enable ipywidgets
     && jupyter nbextension enable --py widgetsnbextension --sys-prefix
 

@@ -18,7 +18,7 @@ RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic main restricted univers
     apt-get install -y iproute2 lsof && \
     pip3 install -U pip
 
-RUN /usr/local/bin/pip install matplotlib astropy notebook widgetsnbextension jupyterhub && \
+RUN /usr/local/bin/pip install matplotlib astropy notebook widgetsnbextension jupyterhub jupyterlab && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
 # Install casa
 RUN  /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools && \

@@ -5,6 +5,8 @@ import traceback
 from ipykernel.ipkernel import IPythonKernel
 from IPython.core.getipython import get_ipython
 import IPython
+import ipywidgets
+
 if 'LD_PRELOAD' in os.environ:
     del os.environ['LD_PRELOAD']
 
@@ -17,7 +19,7 @@ def __init_config(config,flags,args):
 
     config.flags = flags
     config.args = args
- 
+
 ###
 ### this will be used by inp/go which are introduced in init_subparam
 ###
@@ -39,7 +41,7 @@ casa_shutdown_handlers = [ ]
 casa_eval_status = { 'code': 0, 'desc': 0 }
 
 import casashell
-__pylib = os.path.dirname(os.path.realpath(casashell.__file__)) + '/private/' 
+__pylib = os.path.dirname(os.path.realpath(casashell.__file__)) + '/private/'
 __init_scripts = [ "init_system.py",
                  "load_tasks.py",
                  "load_tools.py",
@@ -54,10 +56,10 @@ from casashell.private import config
 from argparse import Namespace
 casa_config_master = config
 args = []
-flags = Namespace(logfile = None, 
-                  log2term = False, 
-                  nologger = False, 
-                  nologfile = False, 
+flags = Namespace(logfile = None,
+                  log2term = False,
+                  nologger = False,
+                  nologfile = False,
                   nogui = False,
                   prompt = 'NoColor',
                   trace = False,
@@ -71,6 +73,39 @@ flags = Namespace(logfile = None,
 
 __init_config(casa_config_master,flags,args)
 
+class LogWidget(ipywidgets.ToggleButton):
+        def __init__(self, logwidget, error):
+            if error:
+                value = True
+                button_style = "danger"
+                logwidget.layout.display = 'flex'
+            else:
+                value = False
+                button_style = "success"
+                logwidget.layout.display = 'none'
+            super().__init__(
+                    value=value,
+                    description='Log',
+                    disabled=False,
+                    button_style=button_style, # 'success', 'info', 'warning', 'danger' or ''
+                    tooltip='Description',
+                    icon='' # (FontAwesome names without the `fa-` prefix)
+            )
+            self.logwidget = logwidget
+
+        def disable_display(self):
+            self.logwidget.layout.display = 'none'
+
+        def enable_display(self):
+            self.logwidget.layout.display = 'flex'
+
+def loghandler(change):
+    """ Show / Hide log messages """
+    if change['new'] == False:
+        change['owner'].disable_display()
+    else:
+        change['owner'].enable_display()
+
 class CasapyKernel(IPythonKernel):
     implementation = 'Casapy'
     implementation_version = '1.0'
@@ -81,15 +116,15 @@ class CasapyKernel(IPythonKernel):
 
     def start(self):
         super(CasapyKernel, self).start()
-        self.do_execute('%matplotlib inline', True, False, {}, False) 
-        #self.do_execute('%matplotlib ipympl', True, False, {}, False) 
-        for i in startup_scripts: 
+        self.do_execute('%matplotlib inline', True, False, {}, False)
+        #self.do_execute('%matplotlib ipympl', True, False, {}, False)
+        for i in startup_scripts:
            self.do_execute('%run -i {}'.format(i), True, False, {}, False)
         wrappers = os.path.dirname(os.path.realpath(__file__)) + '/tasks_wrapped.py'
-        self.do_execute('%run -i {}'.format(wrappers), True, False, {}, False) 
+        self.do_execute('%run -i {}'.format(wrappers), True, False, {}, False)
         import casashell.private.config as config
         self.logfile = open(config.logfile, 'r')
-    
+
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
         result = super(CasapyKernel, self).do_execute(code, silent, store_history, user_expressions, allow_stdin)
@@ -111,23 +146,18 @@ class CasapyKernel(IPythonKernel):
             line = logfile.readline()
         # Display log messages
         if len(loglines) > 0:
-            button_id = str(time.time()).replace('.', '_') # Make sure all IDs are unique
             errorhappened = any(['Some arguments failed to verify' in logline
                                    for logline in loglines]) or \
                             any(['Please check that the file ' in logline
                                    for logline in loglines]) or \
                             any(['An error occurred' in logline
                                    for logline in loglines])
-            if errorhappened:
-                errorcolor = ' style="background-color:red"'
-                errorin = ' in'
-                buttontext = 'Hide log'
-            else:
-                errorcolor = ''
-                errorin = ''
-                buttontext = 'Show log'
-            html_code = '<button type="button" ' + errorcolor + 'class="btn btn-info" data-toggle="collapse" id="' + button_id + '" data-target="#log' + button_id + '" ' +\
-                   'onclick="if ($(\'#\'+this.id).html()==\'Show log\') {$(\'#\'+this.id).html(\'Hide log\')} else {$(\'#\'+this.id).html(\'Show log\')}; return false"' + \
-                   '>' + buttontext + '</button> <div class="collapse' + errorin + '" id="log' + button_id + '">' + "<br>".join(loglines) + '</div>'
-            IPython.display.display_html(html_code, raw=True)
+            out = ipywidgets.Output(layout={'max_height': "20em", 'overflow_y':'auto'})
+            with out:
+                for line in loglines:
+                    print(line, end='')
+            w = LogWidget(out, errorhappened)
+            w.observe(loghandler, 'value')
+            IPython.display.display(w)
+            IPython.display.display(out)
         return result

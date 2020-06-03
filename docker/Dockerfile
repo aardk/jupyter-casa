@@ -130,6 +130,11 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
     && rm -rf casa-asap \
     && rm -rf code 
 
+# Add VLBI scripts
+RUN git clone https://github.com/jive-vlbi/casa-vlbi /usr/local/casa-vlbi \
+    && cp /usr/local/casa-vlbi/*py /usr/local/bin \
+    && cp -r /usr/local/casa-vlbi/casavlbitools $workDir/linux64/lib/python2.7
+
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python2.7/dist-packages
 COPY python/start_casa /usr/local/lib/python2.7/dist-packages/start_casa

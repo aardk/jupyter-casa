@@ -12,7 +12,8 @@ RUN apt-get install -y python2.7 python-dev python-numpy python-scipy python-pip
                        wcslib-dev libboost-program-options-dev libboost-filesystem-dev \
                        libboost-system-dev libboost-python-dev libboost-thread-dev libboost-regex-dev \
                        libqt4-dev pgplot5 openjdk-8-jre libdbus-1-dev libdbus-c++-dev libxml2-dev libxslt1-dev \
-                       libqwt-dev libsqlite3-dev liblog4cxx-dev doxygen swig libgsl-dev curl\
+                       libqwt-dev libsqlite3-dev liblog4cxx-dev doxygen swig libgsl-dev curl \
+                       libgtkmm-3.0-dev liblua5.3-dev libboost-numpy-dev \
     && apt-get clean
 
 # Libgsl from 16.04 is too old for CASA, get the version from 18.04
@@ -134,6 +135,42 @@ RUN git clone -b $CASA_BRANCH https://open-bitbucket.nrao.edu/scm/casa/casa.git 
 RUN git clone https://github.com/jive-vlbi/casa-vlbi /usr/local/casa-vlbi \
     && cp /usr/local/casa-vlbi/*py /usr/local/bin \
     && cp -r /usr/local/casa-vlbi/casavlbitools $workDir/linux64/lib/python2.7
+
+# Add Wsclean
+RUN cd $workDir \
+    && git clone https://github.com/lofar-astron/LOFARBeam.git \
+    && cd LOFARBeam \
+    && git checkout v4.1.1 \
+    && mkdir -p build \
+    && cd build \
+    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
+    && make -j4 \
+    && make install \
+    && cd $workDir \
+    && rm -rf LOFARBeam \
+    && git clone https://git.code.sf.net/p/wsclean/code wsclean-code \
+    && cd wsclean-code \
+    && git checkout wsclean2.9 \
+    && mkdir -p wsclean/build \
+    && cd wsclean/build \
+    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
+    && make -j4 \
+    && make install \
+    && cd $workDir \
+    && rm -rf wsclean-code
+
+# Add AOFLAGGER
+RUN cd $workDir \
+    && git clone https://git.code.sf.net/p/aoflagger/code aoflagger-code \
+    && cd aoflagger-code \
+    && git checkout v2.15.0 \
+    && mkdir -p build \
+    && cd build \
+    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
+    && make -j 4 \
+    && make install \
+    && cd $workDir \
+    && rm -rf aoflagger-code
 
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python2.7/dist-packages

@@ -160,17 +160,30 @@ RUN cd $workDir \
     && rm -rf wsclean-code
 
 # Add AOFLAGGER
-RUN cd $workDir \
-    && git clone https://git.code.sf.net/p/aoflagger/code aoflagger-code \
-    && cd aoflagger-code \
-    && git checkout v2.15.0 \
-    && mkdir -p build \
+RUN apt-get install -y python3-pip libboost-test-dev \
+    && pip3 install pytest \
+    && git clone https://github.com/pybind/pybind11.git \
+    && cd pybind11 \
+    && git checkout v2.5.0 \
+    && mkdir build \
     && cd build \
-    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
-    && make -j 4 \
+    && cmake -DDOWNLOAD_CATCH=1  -DPYBIND11_PYTHON_VERSION=2.7 .. \
+    && make -j4 \
     && make install \
-    && cd $workDir \
-    && rm -rf aoflagger-code
+    && cd .. \
+    && python setup.py install \
+    && cd .. \
+    && rm -rf pybind11 \
+    && git clone https://gitlab.com/aroffringa/aoflagger.git \
+    && sed -i 's/PythonLibs 3 REQUIRED/PythonLibs 2 REQUIRED/' aoflagger/CMakeLists.txt \
+    && mkdir -p aoflagger/build \
+    && cd aoflagger/build \
+    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
+    && make -j4 \
+    &&  make install \
+    && cp /usr/local/lib/aoflagger.so /usr/local/lib/python2.7/dist-packages \
+    && cd ../.. \
+    && rm -rf aoflagger
 
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python2.7/dist-packages

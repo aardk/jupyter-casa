@@ -4,6 +4,7 @@ import sys
 import traceback
 from ipykernel.ipkernel import IPythonKernel
 from IPython.core.getipython import get_ipython
+from traitlets.config.loader import Config
 import IPython
 import ipywidgets
 
@@ -42,34 +43,42 @@ casa_eval_status = { 'code': 0, 'desc': 0 }
 
 import casashell
 __pylib = os.path.dirname(os.path.realpath(casashell.__file__)) + '/private/'
-__init_scripts = [ "init_system.py",
+__init_scripts = [ "init_begin_startup.py",
+                 "init_system.py",
                  "load_tasks.py",
                  "load_tools.py",
                  "init_subparam.py",
                  "init_doc.py",
-                 "init_welcome.py",
+                 "init_welcome.py"
                 ]
 
 startup_scripts = list(filter( os.path.isfile, [__pylib + '/' + f for f in __init_scripts] ))
 
-from casashell.private import config
+
 from argparse import Namespace
-casa_config_master = config
 args = []
 flags = Namespace(logfile = None,
                   log2term = False,
                   nologger = False,
                   nologfile = False,
                   nogui = False,
+                  norc = True,
+                  colors = "Neutral",
                   prompt = 'NoColor',
                   trace = False,
                   pipeline = False,
                   agg = False,
                   ipython_log = False,
                   datapath = None,
-                  crash_report = True,
-                  telemetry = False,
+                  notelemetry = False,
+                  nocrashreport = True,
+                  user_site = True,
                   execute = [])
+import casashell as _cs
+_cs.argv = sys.argv
+_cs.flags = flags
+from casashell.private import config
+casa_config_master = config
 
 __init_config(casa_config_master,flags,args)
 

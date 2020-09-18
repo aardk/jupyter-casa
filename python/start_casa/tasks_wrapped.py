@@ -116,58 +116,55 @@ class listobs_wrapped(_listobs, object):
             self.print_logfile(listfile)
         return retval
 
-# NB: Plotms is not yet implemented for CASA6 yet!
-# Wrap plotms to inline the output plot into the notebook.
 # Unless explicitly enabled we also disable the gui
-#from casashell.private.plotms import _plotms
-#class plotms_wrapped(_plotms, object):
-#    @wrap_casa(_plotms.__call__)
-#    def __call__(self, *args):
-#        params = wrapper_parameters(self, args)
-#        # Set 'plotfile' if not already set, and if we set 'plotfile' then also set 'overwrite'
-#        default_plotfile = 'plotms_temp.png'
-#        params.set_parameter('plotfile', default_plotfile, False, [('overwrite', True, True)])
-#        plotfile = params['plotfile']
-#        
-#        # Disable gui unless explicitly enabled
-#        params.set_parameter('showgui', False, False)
-#        try:
-#            retval = super(plotms_wrapped, self).__call__(*params.args)
-#        finally:
-#            params.restore_parameters()
-#        if retval:
-#            i = IPython.display.Image(plotfile)
-#            IPython.display.display(i)
-#        return retval
+from casaplotms.plotms import _plotms
+class plotms_wrapped(_plotms, object):
+    @wrap_casa(_plotms.__call__)
+    def __call__(self, *args):
+        params = wrapper_parameters(self, args)
+        # Set 'plotfile' if not already set, and if we set 'plotfile' then also set 'overwrite'
+        default_plotfile = 'plotms_temp.png'
+        params.set_parameter('plotfile', default_plotfile, False, [('overwrite', True, True)])
+        plotfile = params['plotfile']
+        
+        # Disable gui unless explicitly enabled
+        params.set_parameter('showgui', False, False)
+        try:
+            retval = super(plotms_wrapped, self).__call__(*params.args)
+        finally:
+            params.restore_parameters()
+        if retval:
+            i = IPython.display.Image(plotfile)
+            IPython.display.display(i)
+        return retval
 
-# NB: viewer is not implemented for CASA6 yet!
 # Wrap viewer to inline the output plot into the notebook.
 # Unless explicitly enabled we also disable the gui
-#from casashell.private.viewer import _viewer
-#class viewer_wrapped(_viewer, object):
-#    @wrap_casa(_viewer.__call__)
-#    def __call__(self, *args):
-#        params = wrapper_parameters(self, args)
-#
-#        # Set 'outfile' if not already set, and if we set 'outfile' then set the output
-#        # format to png
-#        default_outfile = 'viewer_temp.png'
-#        params.set_parameter('outfile', default_outfile, False, [('outformat', 'png', True)])
-#        outfile = params['outfile']
-#        
-#        # Disable gui unless explicitly enabled
-#        params.set_parameter('gui', False, False)
-#        try:
-#            retval = super(viewer_wrapped, self).__call__(*params.args)
-#        finally:
-#            params.restore_parameters()
-#
-#        # NB: The viewer task returns None on success
-#        if retval != False:
-#            i = IPython.display.Image(outfile)
-#            IPython.display.display(i)
-#        return retval
+from casaviewer.imview import _imview
+class imview_wrapped(_imview, object):
+    @wrap_casa(_imview.__call__)
+    def __call__(self, *args):
+        params = wrapper_parameters(self, args)
+
+        # Set 'outfile' if not already set, and if we set 'outfile' then set the output
+        # format to png
+        default_outfile = 'viewer_temp.png'
+        params.set_parameter('outfile', default_outfile, False, [('outformat', 'png', True)])
+        outfile = params['outfile']
+        
+        # Disable gui unless explicitly enabled
+        params.set_parameter('gui', False, False)
+        try:
+            retval = super(imview_wrapped, self).__call__(*params.args)
+        finally:
+            params.restore_parameters()
+
+        # NB: The viewer task returns None on success
+        if retval != False:
+            i = IPython.display.Image(outfile)
+            IPython.display.display(i)
+        return retval
 
 listobs = listobs_wrapped()
-#plotms = plotms_wrapped()
-#viewer = viewer_wrapped()
+plotms = plotms_wrapped()
+imview = imview_wrapped()

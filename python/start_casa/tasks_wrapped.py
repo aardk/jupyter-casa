@@ -1,5 +1,6 @@
 import inspect
 import IPython
+from casashell.private.stack_manip import find_frame
 
 # Decorate wrapper classes such that the __call__ method signiture matches the CASA task
 class wrap_casa(object):
@@ -24,14 +25,14 @@ class wrap_casa(object):
     return wrapped_task
 
 class wrapper_parameters(object):
-    __SET_NONE, __SET_GLOBAL, __SET_PARAM, __SET_ARG = list(range(4))
+    __SET_NONE, __SET_GLOBAL, __REPLACE_GLOBAL, __SET_ARG = list(range(4))
 
     def __init__(self, task, args):
         self.task = task
         self.args = list(args)
         self.aips_style = all([x == None for x in args])
         if self.aips_style:
-            self.frame = stack_frame_find()
+            self.frame = find_frame()
         self.results = {}
         
     def __getitem__(self, key):
@@ -42,28 +43,23 @@ class wrapper_parameters(object):
         results = self.results
         parameter_set = overwrite
         if self.aips_style:
-            # CASA tasks will get their parameters from two locations (#1 has priority)
+            # CASA6 tasks will get their parameters from two locations (#1 has priority)
+            # Note that the parameters structure from CASA 5.* is gone
             # 1. Go up the stack to the IPython stack frame and check if the
             #    parameter exists as a variable in that context
-            # 2. From self.parameters
+            # 2. From self.__TASKNAME_dflt
             frame = self.frame 
             if key in frame and (frame[key] not in ("", None)):
                 if overwrite:
-                    results[key] = (value, self.__SET_GLOBAL, frame[key])
+                    results[key] = (value, self.__REPLACE_GLOBAL, frame[key])
                     frame[key] = value
                 else:
                     results[key] = (frame[key], self.__SET_NONE, frame[key])
-            elif key in task.parameters and (task.parameters[key] not in ("", None)):
-                if overwrite:
-                    results[key] = (value, self.__SET_PARAM, task.parameters[key])
-                    task.parameters[key] = value
-                else:
-                    results[key] = (task.parameters[key], self.__SET_NONE, task.parameters[key])
             else:
                 # parameter not already set
                 parameter_set = True
-                task.parameters[key] = value
-                self.results[key] = (value, self.__SET_PARAM, None)
+                frame[key] = value
+                self.results[key] = (value, self.__SET_GLOBAL, None)
         else:
             args = self.args
             sp = inspect.getargspec(task.__call__)[0][1:]
@@ -83,13 +79,12 @@ class wrapper_parameters(object):
         # Put back parameters altered by set_parameter 
         # (only needed for aips_style task invocation)
         if self.aips_style:
-            parameters = self.task.parameters
             frame = self.frame
             for key, (newval, changed, oldval) in self.results.items():
-                if (changed == self.__SET_PARAM):
-                    parameters[key] = oldval
-                elif (changed == self.__SET_GLOBAL):
+                if (changed == self.__REPLACE_GLOBAL):
                     frame[key] = oldval
+                elif (changed == self.__SET_GLOBAL):
+                    del frame[key]
 
 from casashell.private.listobs import _listobs
 class listobs_wrapped(_listobs, object):
@@ -117,7 +112,7 @@ class listobs_wrapped(_listobs, object):
         return retval
 
 # Unless explicitly enabled we also disable the gui
-from casaplotms.plotms import _plotms
+from casaplotms.gotasks.plotms import _plotms
 class plotms_wrapped(_plotms, object):
     @wrap_casa(_plotms.__call__)
     def __call__(self, *args):
@@ -140,7 +135,7 @@ class plotms_wrapped(_plotms, object):
 
 # Wrap viewer to inline the output plot into the notebook.
 # Unless explicitly enabled we also disable the gui
-from casaviewer.imview import _imview
+from casaviewer.gotasks.imview import _imview
 class imview_wrapped(_imview, object):
     @wrap_casa(_imview.__call__)
     def __call__(self, *args):

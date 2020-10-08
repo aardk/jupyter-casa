@@ -163,3 +163,4 @@ class imview_wrapped(_imview, object):
 listobs = listobs_wrapped()
 plotms = plotms_wrapped()
 imview = imview_wrapped()
+viewer = imview

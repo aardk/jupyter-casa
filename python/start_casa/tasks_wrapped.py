@@ -144,11 +144,11 @@ class imview_wrapped(_imview, object):
         # Set 'outfile' if not already set, and if we set 'outfile' then set the output
         # format to png
         default_outfile = 'viewer_temp.png'
-        params.set_parameter('outfile', default_outfile, False, [('outformat', 'png', True)])
-        outfile = params['outfile']
+        params.set_parameter('out', default_outfile, False)
+        outfile = params['out']
         
         # Disable gui unless explicitly enabled
-        params.set_parameter('gui', False, False)
+        # params.set_parameter('gui', False, False)
         try:
             retval = super(imview_wrapped, self).__call__(*params.args)
         finally:

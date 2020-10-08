@@ -32,8 +32,25 @@ IncludeCmd: no
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell
+    #
+    # Plotms and Casaviewer use appimage which from within singularity need 
+    # root privaliges to mount due to SUID issues, as a work around we extract
+    # the images and modify the casa tasks to call the extracted images
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms
+    cd /usr/local/lib/python3.6/dist-packages/casaplotms/__bin__
+    ./casaplotms-x86_64.AppImage --appimage-extract
+    rm casaplotms-x86_64.AppImage
+    find squashfs-root -type d | xargs chmod 775
+    cd ..
+    sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py
+    #
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer
+    cd /usr/local/lib/python3.6/dist-packages/casaviewer/__bin__
+    ./casaviewer-x86_64.AppImage --appimage-extract
+    rm casaviewer-x86_64.AppImage
+    find squashfs-root -type d | xargs chmod 775
+    cd ..
+    sed -i -e 's/casaviewer-x86_64.AppImage/squashfs-root\/AppRun/' private/config.py
     # carta
     cd /usr/local
     wget https://github.com/CARTAvis/carta/releases/download/v1.2.2/CARTA-v1.2.2-remote.tgz

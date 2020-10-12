@@ -9,7 +9,7 @@ steps of the data reduction are preserved inside the notebook. This means that t
 self-documenting and fully repeatable. It also allows users to very easily make changes to their pipeline and then rerun 
 the pipeline steps affected.
 
-As part of the Obelics work-package of the EU funded [Asterics](https://www.asterics2020.eu/) project we have created a 
+As part of the the EU funded [ESCAPE](https://projectescape.eu/) project we have created a 
 Jupyter kernel for CASA, a widely-used software package for processing astronomical data. 
 The kernel allows all CASA tasks to be run from inside a Jupyter notebook, albeit non-interactively. Tasks which normally 
 spawn a GUI window are wrapped so that their output is saved to an image instead, which is then displayed inside the notebook.

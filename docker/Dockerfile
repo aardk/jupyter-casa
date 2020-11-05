@@ -55,9 +55,7 @@ Run cd /usr/local && \
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python3.6/dist-packages
 COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa
-#COPY python/casa/task_setjy.patch /usr/local/
 COPY jupyter /usr/local/share/jupyter
-#RUN  patch lib/python3.6/dist-packages/casatasks/private/task_setjy.py /usr/local/task_setjy.patch
 
 RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter
 EXPOSE 8888

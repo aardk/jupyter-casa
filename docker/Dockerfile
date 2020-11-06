@@ -48,10 +48,11 @@ RUN  /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repo
     cd .. && \
     sed -i -e 's/casaviewer-x86_64.AppImage/squashfs-root\/AppRun/' private/config.py
 # carta
+ENV CARTAVERSION=1.4
 Run cd /usr/local && \
-    wget https://github.com/CARTAvis/carta/releases/download/v1.2.2/CARTA-v1.2.2-remote.tgz && \
+    wget https://github.com/CARTAvis/carta/releases/download/v${CARTAVERSION}/CARTA-v${CARTAVERSION}-remote.tgz && \
     apt-get install -y libnss3 libgdk-pixbuf2.0-0 libgtk-3-0 #libx11-xcb1 libxss1 libasound2 && \
-    tar zxf CARTA-v1.2.2-remote.tgz
+    tar zxf CARTA-v${CARTAVERSION}-remote.tgz
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python3.6/dist-packages
 COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa

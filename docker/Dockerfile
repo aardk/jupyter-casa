@@ -53,6 +53,76 @@ Run cd /usr/local && \
     wget https://github.com/CARTAvis/carta/releases/download/v${CARTAVERSION}/CARTA-v${CARTAVERSION}-remote.tgz && \
     apt-get install -y libnss3 libgdk-pixbuf2.0-0 libgtk-3-0 #libx11-xcb1 libxss1 libasound2 && \
     tar zxf CARTA-v${CARTAVERSION}-remote.tgz
+
+# Install CASACORE
+ENV CASACORE_VERSION=3.3.0
+RUN apt-get install -y libboost-all-dev build-essential libpython3-dev python3-dev python3-numpy gfortran \
+                       libsofa1-dev flex bison libbison-dev libatlas-base-dev liblapack-dev libcfitsio-dev \
+                       wcslib-dev cmake libreadline-dev libncurses5-dev libgsl-dev libfftw3-dev libhdf5-dev \
+    && cd /usr/local \
+    && wget https://github.com/casacore/casacore/archive/v${CASACORE_VERSION}.tar.gz \
+    && tar xvf v${CASACORE_VERSION}.tar.gz \
+    && mkdir casacore-${CASACORE_VERSION}/build \
+    && cd casacore-${CASACORE_VERSION}/build \
+    && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DBUILD_DEPRECATED=ON -DBUILD_PYTHON=OFF -DBUILD_PYTHON3=ON ../ \
+    && make -j4 \
+    && make install \
+    && cd ../.. \
+    && rm -rf v${CASACORE_VERSION}.tar.gz casacore-${CASACORE_VERSION}
+
+# Add Wsclean
+RUN apt-get install -y git \
+    && cd /usr/local \
+    && git clone https://github.com/lofar-astron/LOFARBeam.git \
+    && cd LOFARBeam \
+    && git checkout v4.1.1 \
+    && mkdir -p build \
+    && cd build \
+#    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
+    && cmake -DPYTHON_EXECUTABLE=$(which python3) .. \
+    && make -j4 \
+    && make install \
+    && cd /usr/local \
+    && rm -rf LOFARBeam \
+    && git clone https://gitlab.com/aroffringa/wsclean.git wsclean-code \
+    && cd wsclean-code \
+    && git checkout v2.10.1 \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+#    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
+    && make -j4 \
+    && make install \
+    && /usr/local/bin/pip install python-casacore \
+    && cd /usr/local \
+    && rm -rf wsclean-code
+
+# Add AOFLAGGER
+RUN apt-get install -y libboost-test-dev libgtkmm-3.0-dev liblua5.3-dev libpng-dev libxml2-dev\
+    && /usr/local/bin/pip install pytest \
+    && git clone https://github.com/pybind/pybind11.git \
+    && cd pybind11 \
+    && git checkout v2.6.0 \
+    && mkdir build \
+    && cd build \
+    && cmake -DDOWNLOAD_CATCH=1 .. \
+    && make -j4 \
+    && make install \
+    && cd .. \
+#    && python setup.py install \
+    && cd .. \
+    && rm -rf pybind11 \
+    && git clone https://gitlab.com/aroffringa/aoflagger.git \
+    && mkdir -p aoflagger/build \
+    && cd aoflagger/build \
+#    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
+    && cmake .. \
+    && make -j4 \
+    && make install \
+#    && cp /usr/local/lib/aoflagger.so /usr/local/lib/python3.6/dist-packages \
+    && cd ../.. \
+    && rm -rf aoflagger
+
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python3.6/dist-packages
 COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa

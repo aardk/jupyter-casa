@@ -64,6 +64,3 @@ IncludeCmd: no
     # Modified casa tasks for Jupyter
     cd /usr/local
     patch lib/python3.6/dist-packages/casatasks/private/task_setjy.py jupyter-casa/python/casa/task_setjy.patch
-    #cp jupyter-casa/python/casa/task_setjy.py $workDir/linux64/lib/python2.7
-    #cp jupyter-casa/python/casa/casa_stack_manip.py $workDir/linux64/lib/python2.7
-    #rm -rf jupyter-casa

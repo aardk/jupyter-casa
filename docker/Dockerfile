@@ -61,11 +61,6 @@ RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter
 EXPOSE 8888
 USER jupyter
 WORKDIR /home/jupyter
-ENV PYTHONPATH="/usr/local/lib/python2.7/dist-packages:/usr/local/casa/linux64/lib/python2.7" \
-    LD_LIBRARY_PATH="/usr/local/casa/linux64/lib" \
-    CASAPATH="/usr/local/casa/ linux64" \
-    PATH="/usr/local/casa/linux64/bin:$PATH" \
-    QT_X11_NO_MITSHM=1
 RUN mkdir -p /home/jupyter/.jupyter /home/jupyter/work
 COPY --chown=jupyter:jupyter docker/jupyter_notebook_config.py /home/jupyter/.jupyter
 COPY --chown=jupyter:jupyter docker/create_font_cache.py /home/jupyter

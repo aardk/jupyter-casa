@@ -137,6 +137,15 @@ IncludeCmd: no
     rm -rf aoflagger
     #
     #########################################
+    # JIVE VLBI Tools
+    #########################################
+    #
+    git clone https://github.com/jive-vlbi/casa-vlbi 
+    cp casa-vlbi/*py /usr/local/bin 
+    cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.6/dist-packages 
+    rm -rf casa-vlbi
+    #
+    #########################################
     # Jupyter-casa
     #########################################
     #

@@ -123,6 +123,12 @@ RUN apt-get install -y libboost-test-dev libgtkmm-3.0-dev liblua5.3-dev libpng-d
     && cd ../.. \
     && rm -rf aoflagger
 
+# Add VLBI scripts
+RUN git clone https://github.com/jive-vlbi/casa-vlbi \
+    && cp casa-vlbi/*py /usr/local/bin \
+    && cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.6/dist-packages \
+    && rm -rf casa-vlbi
+
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python3.6/dist-packages
 COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa

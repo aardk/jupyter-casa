@@ -19,7 +19,7 @@ RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic main restricted univers
     pip3 install -U pip
 
 #node.js
-RUN curl -sL https://deb.nodesource.com/setup_13.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs
 
 # Jupyter notebook and -lab

@@ -146,6 +146,14 @@ IncludeCmd: no
     rm -rf casa-vlbi
     #
     #########################################
+    # Plotcalng
+    #########################################
+    #
+    git clone https://github.com/aardk/casa-plot-tools
+    cp casa-plot-tools/python/plotcalng.py /usr/local/lib/python3.6/dist-packages
+    rm -rf casa-plot-tools
+    #
+    #########################################
     # Jupyter-casa
     #########################################
     #

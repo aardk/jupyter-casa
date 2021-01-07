@@ -129,6 +129,11 @@ RUN git clone https://github.com/jive-vlbi/casa-vlbi \
     && cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.6/dist-packages \
     && rm -rf casa-vlbi
 
+# Add plotcalng; regular plotcal is removed from CASA6
+RUN git clone https://github.com/aardk/casa-plot-tools \
+    && cp casa-plot-tools/python/plotcalng.py /usr/local/lib/python3.6/dist-packages \
+    && rm -rf casa-plot-tools
+
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python3.6/dist-packages
 COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa

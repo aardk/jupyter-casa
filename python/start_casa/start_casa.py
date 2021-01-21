@@ -2,6 +2,7 @@ import os
 import time
 import sys
 import traceback
+import secrets
 from ipykernel.ipkernel import IPythonKernel
 from IPython.core.getipython import get_ipython
 from traitlets.config.loader import Config
@@ -82,39 +83,6 @@ casa_config_master = config
 
 __init_config(casa_config_master,flags,args)
 
-class LogWidget(ipywidgets.ToggleButton):
-        def __init__(self, logwidget, error):
-            if error:
-                value = True
-                button_style = "danger"
-                logwidget.layout.display = 'flex'
-            else:
-                value = False
-                button_style = "success"
-                logwidget.layout.display = 'none'
-            super().__init__(
-                    value=value,
-                    description='Log',
-                    disabled=False,
-                    button_style=button_style, # 'success', 'info', 'warning', 'danger' or ''
-                    tooltip='Description',
-                    icon='' # (FontAwesome names without the `fa-` prefix)
-            )
-            self.logwidget = logwidget
-
-        def disable_display(self):
-            self.logwidget.layout.display = 'none'
-
-        def enable_display(self):
-            self.logwidget.layout.display = 'flex'
-
-def loghandler(change):
-    """ Show / Hide log messages """
-    if change['new'] == False:
-        change['owner'].disable_display()
-    else:
-        change['owner'].enable_display()
-
 class CasapyKernel(IPythonKernel):
     implementation = 'Casapy'
     implementation_version = '1.0'
@@ -133,6 +101,41 @@ class CasapyKernel(IPythonKernel):
         self.do_execute('%run -i {}'.format(wrappers), True, False, {}, False)
         import casashell.private.config as config
         self.logfile = open(config.logfile, 'r')
+        self.init_logbuttons()
+
+    def init_logbuttons(self):
+        self.logbtn_template = """
+<style>
+    label.logbtn {{
+        font-size: larger;
+        font-weight: bold;
+        text-align: center;
+        background-color: {bgcolor};
+        width: 8em;
+        border: 2px solid black;
+        border-radius: 5px;
+        display: block;
+    }}
+    input, label#hidelog{elid}, #log{elid} {{
+        display: none;
+    }}
+    input#logbtn{elid}:checked ~ label#showlog{elid} {{
+        display: none;
+    }}
+    input#logbtn{elid}:checked ~ label#hidelog{elid} {{
+        display: block;
+    }}
+    input#logbtn{elid}:checked ~ #log{elid} {{
+        display: block;
+    }}
+</style>
+<input id="logbtn{elid}" type=checkbox>
+    <label class="logbtn" id="showlog{elid}" for="logbtn{elid}">Show Log</label>
+    <label class="logbtn" id="hidelog{elid}" for="logbtn{elid}">Hide Log</label>
+<div id="log{elid}"> <br />
+    {log}
+    </div>
+"""
 
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
@@ -155,18 +158,15 @@ class CasapyKernel(IPythonKernel):
             line = logfile.readline()
         # Display log messages
         if len(loglines) > 0:
+            # Fixme errorhappened doesn't work for CASA 6.X
             errorhappened = any(['Some arguments failed to verify' in logline
                                    for logline in loglines]) or \
                             any(['Please check that the file ' in logline
                                    for logline in loglines]) or \
                             any(['An error occurred' in logline
                                    for logline in loglines])
-            out = ipywidgets.Output(layout={'max_height': "20em", 'overflow_y':'auto'})
-            with out:
-                for line in loglines:
-                    print(line, end='')
-            w = LogWidget(out, errorhappened)
-            w.observe(loghandler, 'value')
-            IPython.display.display(w)
-            IPython.display.display(out)
+            bgcolor = 'red' if errorhappened else 'green'
+            elementid = secrets.token_urlsafe(16)
+            html_code = self.logbtn_template.format(elid=elementid, bgcolor=bgcolor, log="<br>".join(loglines))
+            IPython.display.display_html(html_code, raw=True)
         return result

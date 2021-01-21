@@ -1,5 +1,8 @@
 # Configuration file for jupyter-notebook.
 
+# Quit button in file menu in jupyterlab
+c.LabApp.quit_button=True
+
 #------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
 #------------------------------------------------------------------------------

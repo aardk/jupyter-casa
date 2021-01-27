@@ -48,7 +48,7 @@ Fortunately, it is fairly straigthforward to make your local filesystem accessib
 For example to mount a directory called */data* inside the container execute:
 
 `
-singularity run -B /data:$HOME/data jupyter-casa.simg
+singularity run -B $HOME/data:/data jupyter-casa.simg
 `
 
 ### Docker

@@ -107,7 +107,6 @@ class CasapyKernel(IPythonKernel):
         self.logbtn_template = """
 <style>
     label.logbtn {{
-        font-size: larger;
         font-weight: bold;
         text-align: center;
         background-color: {bgcolor};

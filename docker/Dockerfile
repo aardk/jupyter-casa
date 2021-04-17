@@ -1,20 +1,16 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 CMD ["jupyter", "notebook"]
-RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic multiverse" >> /etc/apt/sources.list \
-    && echo "deb http://nl.archive.ubuntu.com/ubuntu/ bionic-updates multiverse" >> /etc/apt/sources.list \
-    && apt-get update && apt-get install -y apt-utils debconf-utils && apt-get -y upgrade && apt-get clean
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-ENV PYTHONPATH="/usr/local/lib/python3.6/dist-packages" \
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONPATH="/usr/local/lib/python3.8/dist-packages" \
     QT_X11_NO_MITSHM=1
 
 # Setup enviroment
-RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic main restricted universe multiverse >/etc/apt/sources.list && \
-    echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic-updates main restricted universe multiverse >>/etc/apt/sources.list && \
+RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse >/etc/apt/sources.list && \
+    echo deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse >>/etc/apt/sources.list && \
     export LC_ALL=C && \
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y && \
-    apt-get install -y python3 python3-dev python3-pip libgfortran3 wget && \
+    apt-get install -y python3 python3-dev python3-pip wget && \
     apt-get install -y iproute2 lsof xvfb fuse curl && \
     pip3 install -U pip
 
@@ -30,18 +26,25 @@ RUN /usr/local/bin/pip install matplotlib astropy notebook widgetsnbextension ip
 # NB: Plotms and Casaviewer are distributed as an appimage. Appimages use FUSE, to mount a FUSE 
 # filesystem from within DOCKER requires the container to run in priviliged mode. To avoid this 
 # we extract the images and modify the casa tasks to call the extracted images
-RUN  /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell && \
+# NB: Casatools is a python 3.6 wheel, but unbuntu 20.04 is 3.8; manually install the package
+ENV CASA_VERSION=6.1.2.7
+RUN apt-get install -y unzip && \
+    cd /usr/local/lib/python3.8/dist-packages/ && \
+    wget https://casa-pip.nrao.edu/repository/casa-wheel/packages/casatools/${CASA_VERSION}/casatools-${CASA_VERSION}-cp36-cp36m-linux_x86_64.whl && \
+    unzip -X casatools-${CASA_VERSION}-cp36-cp36m-linux_x86_64.whl && \
+    rm -f casatools-${CASA_VERSION}-cp36-cp36m-linux_x86_64.whl && \
+#    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==${CASA_VERSION} && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==${CASA_VERSION} && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==${CASA_VERSION} && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms && \
-    cd /usr/local/lib/python3.6/dist-packages/casaplotms/__bin__ && \
+    cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__ && \
     ./casaplotms-x86_64.AppImage --appimage-extract && \
     rm casaplotms-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer && \
-    cd /usr/local/lib/python3.6/dist-packages/casaviewer/__bin__ && \
+    cd /usr/local/lib/python3.8/dist-packages/casaviewer/__bin__ && \
     ./casaviewer-x86_64.AppImage --appimage-extract && \
     rm casaviewer-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
@@ -55,9 +58,9 @@ Run cd /usr/local && \
     tar zxf CARTA-v${CARTAVERSION}-remote.tgz
 
 # Install CASACORE
-ENV CASACORE_VERSION=3.3.0
+ENV CASACORE_VERSION=3.4.0
 RUN apt-get install -y libboost-all-dev build-essential libpython3-dev python3-dev python3-numpy gfortran \
-                       libsofa1-dev flex bison libbison-dev libatlas-base-dev liblapack-dev libcfitsio-dev \
+                       flex bison libbison-dev libatlas-base-dev liblapack-dev libcfitsio-dev \
                        wcslib-dev cmake libreadline-dev libncurses5-dev libgsl-dev libfftw3-dev libhdf5-dev \
     && cd /usr/local \
     && wget https://github.com/casacore/casacore/archive/v${CASACORE_VERSION}.tar.gz \
@@ -75,7 +78,7 @@ RUN apt-get install -y git \
     && cd /usr/local \
     && git clone https://github.com/lofar-astron/LOFARBeam.git \
     && cd LOFARBeam \
-    && git checkout v4.1.1 \
+##  && git checkout v4.1.1 # NB v4.1.1 release doesn't work on 20.04
     && mkdir -p build \
     && cd build \
 #    && cmake -DCASACORE_ROOT_DIR=$workDir/linux64 .. \
@@ -98,20 +101,9 @@ RUN apt-get install -y git \
     && rm -rf wsclean-code
 
 # Add AOFLAGGER
-RUN apt-get install -y libboost-test-dev libgtkmm-3.0-dev liblua5.3-dev libpng-dev libxml2-dev\
+RUN apt-get install -y libboost-test-dev libgtkmm-3.0-dev liblua5.3-dev libpng-dev libxml2-dev python3-pybind11\
     && /usr/local/bin/pip install pytest \
-    && git clone https://github.com/pybind/pybind11.git \
-    && cd pybind11 \
-    && git checkout v2.6.0 \
-    && mkdir build \
-    && cd build \
-    && cmake -DDOWNLOAD_CATCH=1 .. \
-    && make -j4 \
-    && make install \
-    && cd .. \
-#    && python setup.py install \
-    && cd .. \
-    && rm -rf pybind11 \
+    && cd /usr/local \
     && git clone https://gitlab.com/aroffringa/aoflagger.git \
     && mkdir -p aoflagger/build \
     && cd aoflagger/build \
@@ -119,24 +111,24 @@ RUN apt-get install -y libboost-test-dev libgtkmm-3.0-dev liblua5.3-dev libpng-d
     && cmake .. \
     && make -j4 \
     && make install \
-#    && cp /usr/local/lib/aoflagger.so /usr/local/lib/python3.6/dist-packages \
+#    && cp /usr/local/lib/aoflagger.so /usr/local/lib/python3.8/dist-packages \
     && cd ../.. \
     && rm -rf aoflagger
 
 # Add VLBI scripts
 RUN git clone https://github.com/jive-vlbi/casa-vlbi \
     && cp casa-vlbi/*py /usr/local/bin \
-    && cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.6/dist-packages \
+    && cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.8/dist-packages \
     && rm -rf casa-vlbi
 
 # Add plotcalng; regular plotcal is removed from CASA6
 RUN git clone https://github.com/aardk/casa-plot-tools \
-    && cp casa-plot-tools/python/plotcalng.py /usr/local/lib/python3.6/dist-packages \
+    && cp casa-plot-tools/python/plotcalng.py /usr/local/lib/python3.8/dist-packages \
     && rm -rf casa-plot-tools
 
 # Install jupyter casa wrapper and copy fixed casa tasked
-RUN mkdir -p /usr/local/lib/python3.6/dist-packages
-COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa
+RUN mkdir -p /usr/local/lib/python3.8/dist-packages
+COPY python/start_casa /usr/local/lib/python3.8/dist-packages/start_casa
 COPY jupyter /usr/local/share/jupyter
 
 RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter

@@ -150,8 +150,9 @@ IncludeCmd: no
     #########################################
     #
     git clone https://github.com/aardk/evn-tools
-    cp evn-tools/python/plotcalng.py /usr/local/lib/python3.6/dist-packages
+    cp -r evn-tools/python/evn_tools /usr/local/lib/python3.6/dist-packages
     rm -rf evn-tools
+    /usr/local/bin/pip install pyvo
     #
     #########################################
     # Jupyter-casa

@@ -141,7 +141,7 @@ RUN mkdir -p /usr/local/lib/python3.6/dist-packages
 COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa
 COPY jupyter /usr/local/share/jupyter
 
-RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter
+RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -s /bin/bash -g jupyter jupyter
 EXPOSE 8888
 USER jupyter
 WORKDIR /home/jupyter

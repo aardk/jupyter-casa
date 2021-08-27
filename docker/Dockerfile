@@ -15,7 +15,7 @@ RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic main restricted univers
     export LC_ALL=C && \
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y && \
     apt-get install -y python3 python3-dev python3-pip libgfortran3 wget && \
-    apt-get install -y iproute2 lsof xvfb fuse curl && \
+    apt-get install -y iproute2 lsof xvfb fuse curl vim nano emacs-nox && \
     pip3 install -U pip
 
 #node.js
@@ -140,7 +140,7 @@ RUN mkdir -p /usr/local/lib/python3.6/dist-packages
 COPY python/start_casa /usr/local/lib/python3.6/dist-packages/start_casa
 COPY jupyter /usr/local/share/jupyter
 
-RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -g jupyter jupyter
+RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -s /bin/bash -g jupyter jupyter
 EXPOSE 8888
 USER jupyter
 WORKDIR /home/jupyter

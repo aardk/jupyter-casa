@@ -49,8 +49,7 @@ __init_scripts = [ "init_begin_startup.py",
                  "load_tasks.py",
                  "load_tools.py",
                  "init_subparam.py",
-                 "init_doc.py",
-                 "init_welcome.py"
+                 "init_doc.py"
                 ]
 
 startup_scripts = list(filter( os.path.isfile, [__pylib + '/' + f for f in __init_scripts] ))

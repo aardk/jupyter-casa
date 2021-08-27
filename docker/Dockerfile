@@ -15,7 +15,7 @@ RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ bionic main restricted univers
     export LC_ALL=C && \
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y && \
     apt-get install -y python3 python3-dev python3-pip libgfortran3 wget && \
-    apt-get install -y iproute2 lsof xvfb fuse curl && \
+    apt-get install -y iproute2 lsof xvfb fuse curl vim nano emacs-nox&& \
     pip3 install -U pip
 
 #node.js

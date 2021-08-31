@@ -128,7 +128,8 @@ class plotms_wrapped(_plotms, object):
             retval = super(plotms_wrapped, self).__call__(*params.args)
         finally:
             params.restore_parameters()
-        if retval:
+        # NB: plotms returns None on success
+        if retval != False:
             i = IPython.display.Image(plotfile)
             IPython.display.display(i)
         return retval

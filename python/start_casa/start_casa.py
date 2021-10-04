@@ -2,7 +2,6 @@ import os
 import time
 import sys
 import traceback
-import secrets
 from ipykernel.ipkernel import IPythonKernel
 from IPython.core.getipython import get_ipython
 from traitlets.config.loader import Config
@@ -104,35 +103,10 @@ class CasapyKernel(IPythonKernel):
 
     def init_logbuttons(self):
         self.logbtn_template = """
-<style>
-    label.logbtn {{
-        font-weight: bold;
-        text-align: center;
-        background-color: {bgcolor};
-        width: 8em;
-        border: 2px solid black;
-        border-radius: 5px;
-        display: block;
-    }}
-    input, label#hidelog{elid}, #log{elid} {{
-        display: none;
-    }}
-    input#logbtn{elid}:checked ~ label#showlog{elid} {{
-        display: none;
-    }}
-    input#logbtn{elid}:checked ~ label#hidelog{elid} {{
-        display: block;
-    }}
-    input#logbtn{elid}:checked ~ #log{elid} {{
-        display: block;
-    }}
-</style>
-<input id="logbtn{elid}" type=checkbox>
-    <label class="logbtn" id="showlog{elid}" for="logbtn{elid}">Show Log</label>
-    <label class="logbtn" id="hidelog{elid}" for="logbtn{elid}">Hide Log</label>
-<div id="log{elid}"> <br />
+<details>
+    <summary>$\color{{{txtcolor}}}{{\mathbf{{LOG~(click~to~expand)}}}}$</summary>
     {log}
-    </div>
+</details>
 """
 
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
@@ -152,7 +126,7 @@ class CasapyKernel(IPythonKernel):
             if len(sline) >= 4:
                 task = sline[3].split(':')[0]
                 if (task != '') and (task != 'casa'):
-                    loglines.append(line)
+                    loglines.append(line.rstrip())
             line = logfile.readline()
         # Display log messages
         if len(loglines) > 0:
@@ -163,8 +137,7 @@ class CasapyKernel(IPythonKernel):
                                    for logline in loglines]) or \
                             any(['An error occurred' in logline
                                    for logline in loglines])
-            bgcolor = 'red' if errorhappened else 'green'
-            elementid = secrets.token_urlsafe(16)
-            html_code = self.logbtn_template.format(elid=elementid, bgcolor=bgcolor, log="<br>".join(loglines))
-            IPython.display.display_html(html_code, raw=True)
+            txtcolor = 'red' if errorhappened else 'green'
+            markdown_code = self.logbtn_template.format(txtcolor=txtcolor, log="<br/>".join(loglines))
+            IPython.display.display_markdown(markdown_code, raw=True)
         return result

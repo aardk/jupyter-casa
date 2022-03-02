@@ -19,7 +19,7 @@ RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe
     pip3 install -U pip
 
 #node.js
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install -y nodejs
 
 # Jupyter notebook and -lab

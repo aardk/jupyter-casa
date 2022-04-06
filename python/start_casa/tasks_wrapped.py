@@ -7,7 +7,7 @@ class wrap_casa(object):
   def __init__(self, casatask):
     self.name = casatask.__name__
     self.doc = casatask.__doc__
-    self.argspec = inspect.getargspec(casatask)
+    self.argspec = inspect.getfullargspec(casatask)
 
   def __call__(self, task):
     sp = self.argspec
@@ -62,7 +62,7 @@ class wrapper_parameters(object):
                 self.results[key] = (value, self.__SET_GLOBAL, None)
         else:
             args = self.args
-            sp = inspect.getargspec(task.__call__)[0][1:]
+            sp = inspect.getfullargspec(task.__call__)[0][1:]
             i = sp.index(key)
             if (args[i] == None) or overwrite:
                 parameter_set = True
@@ -149,7 +149,7 @@ class imview_wrapped(_imview, object):
         outfile = params['out']
         
         # Disable gui unless explicitly enabled
-        # params.set_parameter('gui', False, False)
+        #params.set_parameter('gui', False, False)
         try:
             retval = super(imview_wrapped, self).__call__(*params.args)
         finally:

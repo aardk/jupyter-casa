@@ -64,6 +64,9 @@ RUN git clone https://github.com/aardk/evn-tools \
     && rm -rf evn-tools \
     && /usr/local/bin/pip install pyvo==1.3
 
+# Add some useful python packages
+RUN pip install natsort
+
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python3.8/dist-packages
 COPY python/start_casa /usr/local/lib/python3.8/dist-packages/start_casa

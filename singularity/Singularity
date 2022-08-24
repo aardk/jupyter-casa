@@ -34,16 +34,16 @@ IncludeCmd: no
     jupyter nbextension enable --py widgetsnbextension --sys-prefix
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
     # Install casa
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.4.4.31
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.4.4.31
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.4.4.31
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.5.1.23
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.5.1.23
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.5.1.23
     # Casa measures data
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2022.3.28
     #
     # Plotms and Casaviewer use appimage which from within singularity need 
     # root privaliges to mount due to SUID issues, as a work around we extract
     # the images and modify the casa tasks to call the extracted images
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==1.5.5
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==1.7.3
     cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__
     ./casaplotms-x86_64.AppImage --appimage-extract
     rm casaplotms-x86_64.AppImage
@@ -58,6 +58,12 @@ IncludeCmd: no
     find squashfs-root -type d | xargs chmod 775
     cd ..
     sed -i -e 's/casaviewer-x86_64.AppImage/squashfs-root\/AppRun/' private/config.py
+    #
+    #########################################
+    # Most recent protobuf breaks plotms
+    #########################################
+    #
+    pip install protobuf==3.20.*
     #
     #########################################
     # Install WSCLEAN, AOFLAGGER, and CARTA

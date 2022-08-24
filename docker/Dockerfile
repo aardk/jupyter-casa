@@ -30,11 +30,11 @@ RUN /usr/local/bin/pip install matplotlib astropy notebook widgetsnbextension ip
 # NB: Plotms and Casaviewer are distributed as an appimage. Appimages use FUSE, to mount a FUSE 
 # filesystem from within DOCKER requires the container to run in priviliged mode. To avoid this 
 # we extract the images and modify the casa tasks to call the extracted images
-RUN  /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.4.4.31 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.4.4.31 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.4.4.31 && \
+RUN  /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.5.1.23 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.5.1.23 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.5.1.23 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2022.3.28 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==1.5.5 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==1.7.3 && \
     cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__ && \
     ./casaplotms-x86_64.AppImage --appimage-extract && \
     rm casaplotms-x86_64.AppImage && \
@@ -48,6 +48,10 @@ RUN  /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repo
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casaviewer-x86_64.AppImage/squashfs-root\/AppRun/' private/config.py
+
+# Most recent protobuf breaks plotms
+RUN pip install protobuf==3.20.*
+
 # Install WSCLEAN, AOFLAGGER, and CARTA
 RUN apt-add-repository -y -s ppa:kernsuite/kern-7 \
     && apt-get install -y wsclean aoflagger carta

@@ -1,5 +1,3 @@
-# **The CASA-6 branch is work in progress**
-
 # jupyter-casa
 A [Jupyter](http://jupyter.org/) kernel for [CASA](https://casa.nrao.edu/)
 

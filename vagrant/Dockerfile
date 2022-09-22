@@ -19,5 +19,4 @@ RUN sed -i -e 's/\(UsePAM \)yes/\1 no/' /etc/ssh/sshd_config
 RUN sed -i -e 's/\#X11UseLocalhost yes/X11UseLocalhost no/' /etc/ssh/sshd_config
 
 RUN mkdir /var/run/sshd
-
-RUN apt-get -y install openssh-client
+COPY --chown=jupyter:jupyter jupyter_notebook_config.py /home/jupyter/.jupyter

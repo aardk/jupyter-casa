@@ -20,3 +20,4 @@ RUN sed -i -e 's/\#X11UseLocalhost yes/X11UseLocalhost no/' /etc/ssh/sshd_config
 
 RUN mkdir /var/run/sshd
 COPY --chown=jupyter:jupyter jupyter_notebook_config.py /home/jupyter/.jupyter
+COPY --chown=jupyter:jupyter jupyter_lab_config.py /home/jupyter/.jupyter

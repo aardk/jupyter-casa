@@ -25,7 +25,7 @@ The Docker images can be pulled using:
 docker pull penngwyn/jupytercasa
 `
 
-While it is possible to use the Docker image directly, for endusers it is recommended to use the Docker images through 
+While it is possible to use the Docker image directly, for end users it is recommended to use the Docker images through 
 either [Vagrant](https://www.vagrantup.com/) or [Apptainer/Singularity](https://apptainer.org/). 
 
 ### Vagrant
@@ -42,6 +42,12 @@ In the Vagrantfile there is one line which is commented out:
 `
 
 This line needs to be uncommented (remove the #), and `/path/to/data' has to be replaced by the absolute path to where your data is stored.
+For example:
+
+`
+  config.vm.synced_folder "/opt/shared-data", "/home/jupyter/work"
+`
+
 Then Vagrant can be started by executing (inside the vagrant directory)
 ```
 cd vagrant
@@ -67,12 +73,12 @@ First the Docker image needs to be converted to an Apptainer container by execut
 apptainer pull docker://penngwyn/jupytercasa:latest
 `
 
-Unlike Docker, an Apptainer containter runs with UID of the current user (i.e. the user executing `singularity run`).
+Unlike Docker, an Apptainer container runs with UID of the current user (i.e. the user executing `singularity run`).
 The home directory of the user on the local filesystem will also be accessible inside the container, but by default
 only the home directory is shared with the container. Therefore any symbolic links which point to locations outside of the
 home directory will not be valid inside the container.
 
-Fortunately, it is fairly straigthforward to make your local filesystem accessible to the container using the *-B* option.
+Fortunately, it is fairly straightforward to make your local filesystem accessible to the container using the *-B* option.
 For example to mount a directory called */data* inside the container execute:
 
 `

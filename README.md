@@ -14,32 +14,60 @@ Jupyter kernel for CASA, a widely-used software package for processing astronomi
 The kernel allows all CASA tasks to be run from inside a Jupyter notebook, albeit non-interactively. Tasks which normally 
 spawn a GUI window are wrapped so that their output is saved to an image instead, which is then displayed inside the notebook.
 
+The Jupyter kernel is distributed as a [Docker](https://hub.docker.com/r/penngwyn/jupytercasa) image which includes the latest
+version of CASA and a number of additional software (see below).
+
 ## Installation
 
-Because Jupyter requires a much more current python distibution than what is provided in NRAO's CASA releases, a custom build
-of CASA is required. We distribute a [DOCKER](https://www.docker.com/) image containing a version of CASA which uses the
-most recent (I)python, matplotlib, etc. Note that this version of CASA can only be used from within Jupyter.
+The Docker images can be pulled using:
 
-Installation is as simple as executing:
 `
 docker pull penngwyn/jupytercasa
 `
 
-Alternatively there is also a [SINGULARITY](http://singularity.lbl.gov/index.html) image which may be a bit easier to use, it can be downloaded by executing:
+While it is possible to use the Docker image directly, for endusers it is recommended to use the Docker images through 
+either [Vagrant](https://www.vagrantup.com/) or [Apptainer/Singularity](https://apptainer.org/). 
+
+### Vagrant
+
+Vagrant is a front-end for various containerization and virtualization technologies, including Docker.
+Installation instructions for Vagrant can he found here: https://www.vagrantup.com/downloads
+
+Before Jupyter-casa can be used in Vagrant you first need to tell Vagrant where your data lives.
+Vagrant is controlled through a file called [Vagrantfile](vagrant/Vagrantfile). 
+In the Vagrantfile there is one line which is commented out:
 
 `
-singularity pull --name jupyter-casa.simg shub://aardk/jupyter-casa:docker
+ #config.vm.synced_folder "/path/to/data", "/home/jupyter/work"
 `
 
+This line needs to be uncommented (remove the #), and `/path/to/data' has to be replaced by the absolute path to where your data is stored.
+Then Vagrant can be started by executing (inside the vagrant directory)
+```
+cd vagrant
+vagrant up
+```
+After the Vagrant virtual machine has been started you can connect to it via `ssh` by executing (still inside the vagrant directory)
+```
+vagrant ssh
+```
+This will give you a shell within the Vagrant VM, jupyter can then be started by executing
+```
+jupyter lab
+```
 ## Usage
-### Singularity
-The simplest way to start the Jupyter server is to execute:
+### Apptainer/Singularity
+
+Apptainer is the new name for the Singularity container system. All commands below use Apptainer, but if you still have
+Singularity installed then you can simply replace apptainer with singularity in each command.
+
+First the Docker image needs to be converted to an Apptainer container by executing
 
 `
-singularity run jupyter-casa.simg
+apptainer pull docker://penngwyn/jupytercasa:latest
 `
 
-Unlike DOCKER, a SINGULARITY containter runs with UID of the current user (i.e. the user executing `singularity run`).
+Unlike Docker, an Apptainer containter runs with UID of the current user (i.e. the user executing `singularity run`).
 The home directory of the user on the local filesystem will also be accessible inside the container, but by default
 only the home directory is shared with the container. Therefore any symbolic links which point to locations outside of the
 home directory will not be valid inside the container.
@@ -48,7 +76,7 @@ Fortunately, it is fairly straigthforward to make your local filesystem accessib
 For example to mount a directory called */data* inside the container execute:
 
 `
-singularity run -B /data:$HOME/data jupyter-casa.simg
+apptainer run -B /data:$HOME/data jupytercasa_latest.sif
 `
 
 ### Docker

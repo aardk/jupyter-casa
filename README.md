@@ -12,7 +12,7 @@ the pipeline steps affected.
 As part of the EU funded [ESCAPE](https://projectescape.eu/) project we have created a 
 Jupyter kernel for CASA, a widely-used software package for processing astronomical data. 
 The kernel allows all CASA tasks to be run from inside a Jupyter notebook, albeit non-interactively. Tasks which normally 
-spawn a GUI window are wrapped so that their output is saved to an image instead, which is then displayed inside the notebook.
+spawn a GUI window are wrapped so that their output is displayed inside the notebook instead.
 
 The Jupyter kernel is distributed as a [Docker](https://hub.docker.com/r/penngwyn/jupytercasa) image which includes the latest
 version of CASA and a number of additional software (see below).
@@ -20,12 +20,11 @@ version of CASA and a number of additional software (see below).
 ## Installation
 
 The Docker images can be pulled using:
-
-`
+```
 docker pull penngwyn/jupytercasa
-`
+```
 
-While it is possible to use the Docker image directly, for end users it is recommended to use the Docker images through 
+While it is possible to use this Docker image directly, for end users it is recommended to use the Docker images through 
 either [Vagrant](https://www.vagrantup.com/) or [Apptainer/Singularity](https://apptainer.org/). 
 
 ### Vagrant
@@ -33,31 +32,34 @@ either [Vagrant](https://www.vagrantup.com/) or [Apptainer/Singularity](https://
 Vagrant is a front-end for various containerization and virtualization technologies, including Docker.
 Installation instructions for Vagrant can he found here: https://www.vagrantup.com/downloads
 
-Before Jupyter-casa can be used in Vagrant you first need to tell Vagrant where your data lives.
-Vagrant is controlled through a file called [Vagrantfile](vagrant/Vagrantfile). 
-In the Vagrantfile there is one line which is commented out:
+After cloning this Git repository, change to the Vagrant directory inside the repository
+```
+git clone https://github.com/aardk/jupyter-casa.git
+cd jupyter-casa/vagrant
+```
 
-`
+Before jupyter-casa can launched, you first need to tell Vagrant where your data lives.
+Vagrant is controlled through a file called [Vagrantfile](vagrant/Vagrantfile). 
+In the provided Vagrantfile there is one line which is commented out:
+```
  #config.vm.synced_folder "/path/to/data", "/home/jupyter/work"
-`
+```
 
 This line needs to be uncommented (remove the #), and `/path/to/data' has to be replaced by the absolute path to where your data is stored.
 For example:
-
-`
-  config.vm.synced_folder "/opt/shared-data", "/home/jupyter/work"
-`
-
-Then Vagrant can be started by executing (inside the vagrant directory)
 ```
-cd vagrant
+  config.vm.synced_folder "/opt/shared-data", "/home/jupyter/work"
+```
+
+Then Vagrant can be started by executing (still inside the vagrant directory)
+```
 vagrant up
 ```
-After the Vagrant virtual machine has been started you can connect to it via `ssh` by executing (still inside the vagrant directory)
+After the Vagrant virtual machine has been started you can connect to it via *ssh* by executing (still inside the vagrant directory)
 ```
 vagrant ssh
 ```
-This will give you a shell within the Vagrant VM, jupyter can then be started by executing
+This will give you a shell within a Vagrant VM, jupyter can then be started by executing
 ```
 jupyter lab
 ```

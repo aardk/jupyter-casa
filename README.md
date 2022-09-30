@@ -46,7 +46,7 @@ In the provided Vagrantfile there is one line which is commented out:
 ```
 
 This line needs to be uncommented (remove the #), and `/path/to/data' has to be replaced by the absolute path to where your data is stored.
-For example:
+For example, if the data are stored in a directory called _/opt/shared-data_ then we add
 ```
   config.vm.synced_folder "/opt/shared-data", "/home/jupyter/work"
 ```

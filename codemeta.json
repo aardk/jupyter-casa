@@ -7,9 +7,14 @@
     "datePublished": "2022-10-03",
     "dateModified": "2022-10-03",
     "downloadUrl": "https://github.com/aardk/jupyter-casa",
+    "issueTracker": "https://github.com/aardk/jupyter-casa/issues",
+    "funder": "European Union's Horizon 2020 research and innovation programme",
+    "keywords": ["JIVE", "Astronomy", "jupyter-notebook"],
     "name": "Jupyter-CASA",
+    "softwareVersion": "6.5.1",
     "version": "6.5.1",
     "description": "A Jupyter kernel for CASA, a popular data processing suite for radio astronomy. The software is packaged together with CASA as a Docker container.",
+    "readme": "https://github.com/aardk/jupyter-casa/blob/master/README.md",
     "programmingLanguage": [
         "Python 3"
     ],
@@ -21,6 +26,19 @@
         "Docker, Jupyter"
     ],
     "author": [
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0002-5575-2774",
+            "givenName": "Aard",
+            "familyName": "Keimpema",
+            "email": "keimpema@jive.eu",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Join Institute for VLBI ERIC"
+            }
+        }
+    ],
+    "maintainer": [
         {
             "@type": "Person",
             "@id": "https://orcid.org/0000-0002-5575-2774",

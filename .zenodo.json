@@ -1,0 +1,46 @@
+{
+    "access_right": "open",
+    "communities": [
+        {
+            "identifier": "escape2020"
+        }
+    ],
+    "creators": [
+        {
+            "affiliation": "Join Institute for VLBI ERIC",
+            "name": "Keimpema, Aard",
+            "orcid": "0000-0002-5575-2774"
+        }
+    ],
+    "description": "A Jupyter kernel for CASA, a popular data processing suite for radio astronomy. The software is packaged together with CASA as a Docker container.",
+    "grants": [
+        {
+            "id": "10.13039/501100000780::824064"
+        }
+    ],
+    "keywords": [
+        "JIVE",
+        "Astronomy",
+        "jupyter-notebook"
+    ],
+    "language": "eng",
+    "license": "GPL-2.0+",
+    "publication_date": "2022-10-03",
+    "related_identifiers": [
+        {
+            "identifier": "git+https://github.com/aardk/jupyter-casa",
+            "relation": "isDerivedFrom",
+            "resource_type": "software",
+            "scheme": "url"
+        },
+        {
+            "identifier": "https://github.com/aardk/jupyter-casa/blob/master/README.md",
+            "relation": "isDocumentedBy",
+            "resource_type": "publication-softwaredocumentation",
+            "scheme": "url"
+        }
+    ],
+    "title": "Jupyter-CASA",
+    "upload_type": "software",
+    "version": "6.5.1"
+}

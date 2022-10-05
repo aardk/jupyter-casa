@@ -8,7 +8,13 @@
     "dateModified": "2022-10-03",
     "downloadUrl": "https://github.com/aardk/jupyter-casa",
     "issueTracker": "https://github.com/aardk/jupyter-casa/issues",
-    "funder": "European Union's Horizon 2020 research and innovation programme",
+    "funder":[
+    {
+      "@type": "Organization",
+      "name": "European Commission",
+      "@id": "https://doi.org/10.13039/501100000780"
+    }],
+    "funding": "824064",
     "keywords": ["JIVE", "Astronomy", "jupyter-notebook"],
     "name": "Jupyter-CASA",
     "softwareVersion": "6.5.1",

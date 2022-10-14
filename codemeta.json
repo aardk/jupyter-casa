@@ -42,6 +42,39 @@
                 "@type": "Organization",
                 "name": "Join Institute for VLBI ERIC"
             }
+        },
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0002-6156-5617",
+            "givenName": "Mark",
+            "familyName": "Kettenis",
+            "email": "kettenis@jive.eu",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Join Institute for VLBI ERIC"
+            }
+        },
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0003-3723-5404",
+            "givenName": "Des",
+            "familyName": "Small",
+            "email": "small@jive.eu",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Join Institute for VLBI ERIC"
+            }
+        },
+        {
+            "@type": "Person",
+            "@id": "http://orcid.org/0000-0001-5473-2950",
+            "givenName": "Ilse",
+            "familyName": "van Bemmel",
+            "email": "bemmel@jive.eu",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Join Institute for VLBI ERIC"
+            }
         }
     ],
     "maintainer": [
@@ -56,5 +89,6 @@
                 "name": "Join Institute for VLBI ERIC"
             }
         }
-    ]
+    ],
+    "citation": [ "https://arxiv.org/abs/2210.02275", "https://arxiv.org/abs/2210.02276"]
 }

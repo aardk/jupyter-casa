@@ -124,6 +124,9 @@ class plotms_wrapped(_plotms, object):
         
         # Disable gui unless explicitly enabled
         params.set_parameter('showgui', False, False)
+        # If there is no gui then default to Highres to get rid of warning
+        if not params['showgui']:
+            params.set_parameter('highres', True, False)
         try:
             retval = super(plotms_wrapped, self).__call__(*params.args)
         finally:

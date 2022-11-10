@@ -1,1 +1,1 @@
-FROM penngwyn/jupytercasa-demo:binder
+FROM penngwyn/jupytercasa

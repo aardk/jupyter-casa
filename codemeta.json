@@ -3,9 +3,9 @@
     "@type": "SoftwareSourceCode",
     "license": "https://spdx.org/licenses/GPL-2.0+",
     "codeRepository": "git+https://github.com/aardk/jupyter-casa",
-    "dateCreated": "2022-10-03",
-    "datePublished": "2022-10-03",
-    "dateModified": "2022-10-03",
+    "dateCreated": "2023-03-24",
+    "datePublished": "2023-03-24",
+    "dateModified": "2023-03-24",
     "downloadUrl": "https://github.com/aardk/jupyter-casa",
     "issueTracker": "https://github.com/aardk/jupyter-casa/issues",
     "funder":[
@@ -17,8 +17,8 @@
     "funding": "824064",
     "keywords": ["JIVE", "Astronomy", "jupyter-notebook"],
     "name": "Jupyter-CASA",
-    "softwareVersion": "6.5.1",
-    "version": "6.5.1",
+    "softwareVersion": "6.5.3",
+    "version": "6.5.3",
     "description": "A Jupyter kernel for CASA, a popular data processing suite for radio astronomy. The software is packaged together with CASA as a Docker container.",
     "readme": "https://github.com/aardk/jupyter-casa/blob/master/README.md",
     "programmingLanguage": [

@@ -19,7 +19,7 @@ RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe
     pip3 install -U pip
 
 #node.js
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs
 
 # Jupyter notebook and -lab
@@ -30,18 +30,19 @@ RUN /usr/local/bin/pip install matplotlib astropy notebook widgetsnbextension ip
 # NB: Plotms and Casaviewer are distributed as an appimage. Appimages use FUSE, to mount a FUSE 
 # filesystem from within DOCKER requires the container to run in priviliged mode. To avoid this 
 # we extract the images and modify the casa tasks to call the extracted images
-RUN  /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.5.1.23 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.5.1.23 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.5.1.23 && \
+
+RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.5.3.28 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.5.3.28 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.5.3.28 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2022.3.28 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==1.7.3 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==1.9.1 && \
     cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__ && \
     ./casaplotms-x86_64.AppImage --appimage-extract && \
     rm casaplotms-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.5.2 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.7.1 && \
     cd /usr/local/lib/python3.8/dist-packages/casaviewer/__bin__ && \
     ./casaviewer-x86_64.AppImage --appimage-extract && \
     rm casaviewer-x86_64.AppImage && \

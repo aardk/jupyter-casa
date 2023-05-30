@@ -23,7 +23,7 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs
 
 # Jupyter notebook and -lab
-RUN /usr/local/bin/pip install matplotlib astropy notebook widgetsnbextension ipywidgets jupyterhub jupyterlab && \
+RUN /usr/local/bin/pip install matplotlib astropy notebook==6.5.4 widgetsnbextension==3.6.4 ipywidgets==7.7.5 jupyterhub==3.1.1 jupyterlab==3.6.3 && \
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
 # Install casa

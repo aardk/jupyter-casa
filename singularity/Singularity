@@ -18,6 +18,7 @@ IncludeCmd: no
 
 %post
     # Setup enviroment
+    export DEBIAN_FRONTEND=noninteractive
     echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse >/etc/apt/sources.list
     echo deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse >>/etc/apt/sources.list
 

@@ -19,30 +19,36 @@ RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe
     pip3 install -U pip
 
 #node.js
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
 # Jupyter notebook and -lab
-RUN /usr/local/bin/pip install matplotlib astropy notebook==6.5.4 widgetsnbextension==3.6.4 ipywidgets==7.7.5 jupyterhub==3.1.1 jupyterlab==3.6.3 && \
-    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
+RUN /usr/local/bin/pip install matplotlib astropy notebook==7.0.6 widgetsnbextension==4.0.9 ipywidgets==8.1.1 jupyterhub==4.0.2 jupyterlab==4.0.10 && \
+    #jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
 # Install casa
 # NB: Plotms and Casaviewer are distributed as an appimage. Appimages use FUSE, to mount a FUSE 
 # filesystem from within DOCKER requires the container to run in priviliged mode. To avoid this 
 # we extract the images and modify the casa tasks to call the extracted images
 
-RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.5.5.21 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.5.5.21 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.5.5.21 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2023.4.10 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.0.1 && \
+RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.0.20 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.6.0.20 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.6.0.20 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatestutils==6.6.0.20 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotserver==1.7.1 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple almatasks==1.7.1 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatablebrowser==0.0.33 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.17 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casafeather==0.0.20 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2023.9.25 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.2.4 && \
     cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__ && \
     ./casaplotms-x86_64.AppImage --appimage-extract && \
     rm casaplotms-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.7.1 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.9.1 && \
     cd /usr/local/lib/python3.8/dist-packages/casaviewer/__bin__ && \
     ./casaviewer-x86_64.AppImage --appimage-extract && \
     rm casaviewer-x86_64.AppImage && \
@@ -53,9 +59,14 @@ RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repos
 # Most recent protobuf breaks plotms
 RUN pip install protobuf==3.20.*
 
-# Install WSCLEAN, AOFLAGGER, and CARTA
-RUN apt-add-repository -y -s ppa:kernsuite/kern-7 \
-    && apt-get install -y wsclean aoflagger carta
+# Install WSCLEAN, AOFLAGGER
+RUN apt-add-repository -y -s ppa:kernsuite/kern-8 \
+    && apt-get install -y wsclean aoflagger
+
+# Install CARTA
+RUN add-apt-repository -y ppa:cartavis-team/carta \
+    && apt-get update \
+    && apt install -y carta
 
 # Add VLBI scripts
 RUN git clone https://github.com/jive-vlbi/casa-vlbi \

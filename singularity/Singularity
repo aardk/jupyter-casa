@@ -27,23 +27,19 @@ IncludeCmd: no
     apt-get install -y git lsof xvfb vim nano emacs-nox curl
     pip3 install -U pip
     # Nodejs
-    curl -sL https://deb.nodesource.com/setup_18.x | bash - 
+    curl -sL https://deb.nodesource.com/setup_20.x | bash - 
     apt-get install -y nodejs
     # Jupyterlab
     /usr/local/bin/pip install matplotlib astropy notebook==6.5.4 widgetsnbextension==3.6.4 ipywidgets==7.7.5 jupyterhub==3.1.1 jupyterlab==3.6.3
-    jupyter nbextension enable --py widgetsnbextension --sys-prefix
+    #jupyter nbextension enable --py widgetsnbextension --sys-prefix
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
     # Install casa
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.5.5.21
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.5.5.21
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.5.5.21
-    # Casa measures data
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2023.4.10
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.0.20 casatasks==6.6.0.20 casashell==6.6.0.20 casatestutils==6.6.0.20 casaplotserver==1.7.1 almatasks==1.7.1 casatablebrowser==0.0.33 casalogger==1.0.17 casafeather==0.0.20 casadata==2023.9.25
     #
     # Plotms and Casaviewer use appimage which from within singularity need 
     # root privaliges to mount due to SUID issues, as a work around we extract
     # the images and modify the casa tasks to call the extracted images
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.0.1
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.2.4
     cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__
     ./casaplotms-x86_64.AppImage --appimage-extract
     rm casaplotms-x86_64.AppImage
@@ -51,7 +47,7 @@ IncludeCmd: no
     cd ..
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py
     #
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.7.1
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.9.1
     cd /usr/local/lib/python3.8/dist-packages/casaviewer/__bin__
     ./casaviewer-x86_64.AppImage --appimage-extract
     rm casaviewer-x86_64.AppImage
@@ -69,7 +65,8 @@ IncludeCmd: no
     # Install WSCLEAN, AOFLAGGER, and CARTA
     #########################################
     #
-    apt-add-repository -y -s ppa:kernsuite/kern-7
+    apt-add-repository -y -s ppa:kernsuite/kern-8
+    apt-add-repository -y ppa:cartavis-team/carta
     apt-get install -y wsclean aoflagger carta
     #
     #########################################

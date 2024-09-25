@@ -1,8 +1,5 @@
 FROM ubuntu:22.04
-CMD ["jupyter", "notebook"]
-RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ focal multiverse" >> /etc/apt/sources.list \
-    && echo "deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates multiverse" >> /etc/apt/sources.list \
-    && apt-get update && apt-get install -y apt-utils debconf-utils && apt-get -y upgrade && apt-get clean
+CMD ["jupyter", "lab"]
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -11,9 +8,10 @@ ENV PYTHONPATH="/usr/local/lib/python3.10/dist-packages" \
 
 # Setup enviroment
 RUN export LC_ALL=C && \
-    apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y && \
+    apt-get update && apt-get install -y apt-utils debconf-utils && apt-get -y upgrade && \
     apt-get install -y python3 python3-dev python3-pip libgfortran5 wget software-properties-common && \
     apt-get install -y git lsof xvfb fuse curl vim nano emacs-nox&& \
+    apt-get clean &&\
     pip3 install -U pip
 
 #node.js
@@ -65,12 +63,13 @@ RUN pip install protobuf==3.20.*
 
 # Install WSCLEAN, AOFLAGGER
 RUN apt-add-repository -y -s ppa:kernsuite/kern-9 \
+    && apt-get update \
     && apt-get install -y wsclean aoflagger
 
 # Install CARTA
 RUN add-apt-repository -y ppa:cartavis-team/carta \
     && apt-get update \
-    && apt install -y carta
+    && apt-get install -y carta
 
 # Add VLBI scripts
 RUN git clone https://github.com/jive-vlbi/casa-vlbi \

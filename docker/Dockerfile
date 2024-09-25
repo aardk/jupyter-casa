@@ -31,24 +31,30 @@ RUN /usr/local/bin/pip install matplotlib astropy notebook==7.0.6 widgetsnbexten
 # filesystem from within DOCKER requires the container to run in priviliged mode. To avoid this 
 # we extract the images and modify the casa tasks to call the extracted images
 
-RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.0.20 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.6.0.20 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.6.0.20 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatestutils==6.6.0.20 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotserver==1.7.1 && \
+RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.5.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.6.5.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.6.5.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatestutils==6.6.5.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotserver==1.8.2 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple almatasks==1.7.1 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatablebrowser==0.0.33 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.17 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casafeather==0.0.20 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2023.9.25 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.2.4 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatablebrowser==0.0.35 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casafeather==0.0.22 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2024.8.26 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.19 && \
+    cd /usr/local/lib/python3.8/dist-packages/casalogger/__bin__ && \
+    ./casalogger-x86_64.AppImage --appimage-extract && \
+    rm casalogger-x86_64.AppImage && \
+    find squashfs-root -type d | xargs chmod 775 && \
+    cd .. && \
+    sed -i -e 's/casalogger-x86_64.AppImage/squashfs-root\/AppRun/' casalogger.py && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.5.2 && \
     cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__ && \
     ./casaplotms-x86_64.AppImage --appimage-extract && \
     rm casaplotms-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.9.1 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==2.2.3 && \
     cd /usr/local/lib/python3.8/dist-packages/casaviewer/__bin__ && \
     ./casaviewer-x86_64.AppImage --appimage-extract && \
     rm casaviewer-x86_64.AppImage && \
@@ -86,6 +92,8 @@ RUN pip install natsort
 # Install jupyter casa wrapper and copy fixed casa tasked
 RUN mkdir -p /usr/local/lib/python3.8/dist-packages
 COPY python/start_casa /usr/local/lib/python3.8/dist-packages/start_casa
+RUN mkdir -p /opt/casa
+COPY casasiteconfig.py /opt/casa
 COPY jupyter /usr/local/share/jupyter
 
 RUN groupadd -g 1000  jupyter && useradd -u 1000 -m -s /bin/bash -g jupyter jupyter

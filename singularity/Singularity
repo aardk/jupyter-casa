@@ -15,6 +15,8 @@ IncludeCmd: no
     # Add jupyter-casa tree to container
     mkdir ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
     cp -r jupyter python ${SINGULARITY_ROOTFS}/usr/local/jupyter-casa
+    mkdir -p ${SINGULARITY_ROOTFS}/opt/casa
+    cp casasiteconfig.py ${SINGULARITY_ROOTFS}/opt/casa
 
 %post
     # Setup enviroment
@@ -35,11 +37,19 @@ IncludeCmd: no
     #jupyter nbextension enable --py widgetsnbextension --sys-prefix
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
     # Install casa
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.0.20 casatasks==6.6.0.20 casashell==6.6.0.20 casatestutils==6.6.0.20 casaplotserver==1.7.1 almatasks==1.7.1 casatablebrowser==0.0.33 casalogger==1.0.17 casafeather==0.0.20 casadata==2023.9.25
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.5.31 casatasks==6.6.5.31 casashell==6.6.5.31 casatestutils==6.6.5.31 casaplotserver==1.8.2 almatasks==1.7.1 casatablebrowser==0.0.35 casafeather==0.0.22 casadata==2024.8.26
     #
-    # Plotms and Casaviewer use appimage which from within singularity need 
+    # Plotms, casaviewer, and casalogger use appimage which from within singularity need 
     # root privaliges to mount due to SUID issues, as a work around we extract
     # the images and modify the casa tasks to call the extracted images
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.19
+    cd /usr/local/lib/python3.8/dist-packages/casalogger/__bin__
+    ./casalogger-x86_64.AppImage --appimage-extract
+    rm casalogger-x86_64.AppImage
+    find squashfs-root -type d | xargs chmod 775
+    cd ..
+    sed -i -e 's/casalogger-x86_64.AppImage/squashfs-root\/AppRun/' casalogger.py
+    #
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.2.4
     cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__
     ./casaplotms-x86_64.AppImage --appimage-extract

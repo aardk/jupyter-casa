@@ -12,12 +12,15 @@ import ipywidgets
 if 'LD_PRELOAD' in os.environ:
     del os.environ['LD_PRELOAD']
 
+from casaconfig import config as casa_config_master
+
 def __init_config(config,flags,args):
     if flags.datapath is not None:
-        datap = list(map(os.path.abspath,filter(os.path.isdir,list(flags.datapath.split(':')))))
+        # expand all of the datapath elements in the string, separated by a colon
+        # and then only include abspath to the ones that are directories
+        datap = list(map(_os.path.expanduser,list(flags.datapath.split(':'))))
+        datap = list(map(_os.path.abspath,filter(_os.path.isdir,datap)))
         config.datapath = datap
-    if flags.logfile is not None:
-        config.logfile = flags.logfile if flags.logfile.startswith("/") else os.path.realpath(os.path.join('.',flags.logfile))
 
     config.flags = flags
     config.args = args
@@ -31,11 +34,7 @@ casa_inp_go_state = { 'last': None }
 ### this will be used by register_builtin for making casa builtins immutable
 ###
 casa_builtin_state = { }
-
-##
-## this is filled via add_shutdown_hook (from casa_shutdown.py)
-##
-casa_shutdown_handlers = [ ]
+casa_nonbuiltin_state = { }    ### things that should be builtin but are not
 
 ##
 ## filled when -c <args> is used
@@ -77,10 +76,8 @@ flags = Namespace(logfile = None,
 import casashell as _cs
 _cs.argv = sys.argv
 _cs.flags = flags
-from casashell.private import config
-casa_config_master = config
 
-__init_config(casa_config_master,flags,args)
+__init_config(_cs.casa_config_master,flags,args)
 
 class CasapyKernel(IPythonKernel):
     implementation = 'Casapy'
@@ -98,7 +95,7 @@ class CasapyKernel(IPythonKernel):
             self.do_execute('%run -i {}'.format(i), True, False, {}, False)
         wrappers = os.path.dirname(os.path.realpath(__file__)) + '/tasks_wrapped.py'
         self.do_execute('%run -i {}'.format(wrappers), True, False, {}, False)
-        import casashell.private.config as config
+        from casaconfig import config
         self.logfile = open(config.logfile, 'r')
         self.init_logbuttons()
 

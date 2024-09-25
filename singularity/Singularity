@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: ubuntu:20.04
+From: ubuntu:22.04
 IncludeCmd: no
 
 %runscript
@@ -7,7 +7,7 @@ IncludeCmd: no
     jupyter notebook
 
 %environment
-    export PYTHONPATH="/usr/local/lib/python3.8/dist-packages" 
+    export PYTHONPATH="/usr/local/lib/python3.10/dist-packages" 
     export QT_X11_NO_MITSHM=1
     unset XDG_RUNTIME_DIR 
 
@@ -21,8 +21,8 @@ IncludeCmd: no
 %post
     # Setup enviroment
     export DEBIAN_FRONTEND=noninteractive
-    echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse >/etc/apt/sources.list
-    echo deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse >>/etc/apt/sources.list
+    #echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse >/etc/apt/sources.list
+    #echo deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse >>/etc/apt/sources.list
 
     export LC_ALL=C
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y
@@ -37,13 +37,13 @@ IncludeCmd: no
     #jupyter nbextension enable --py widgetsnbextension --sys-prefix
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
     # Install casa
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.5.31 casatasks==6.6.5.31 casashell==6.6.5.31 casatestutils==6.6.5.31 casaplotserver==1.8.2 almatasks==1.7.1 casatablebrowser==0.0.35 casafeather==0.0.22 casadata==2024.8.26
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.5.31 casatasks==6.6.5.31 casashell==6.6.5.31 casatestutils==6.6.5.31 casaplotserver==1.8.2 casatablebrowser==0.0.35 casafeather==0.0.22 casadata==2024.8.26 #almatasks==1.7.1
     #
     # Plotms, casaviewer, and casalogger use appimage which from within singularity need 
     # root privaliges to mount due to SUID issues, as a work around we extract
     # the images and modify the casa tasks to call the extracted images
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.19
-    cd /usr/local/lib/python3.8/dist-packages/casalogger/__bin__
+    cd /usr/local/lib/python3.10/dist-packages/casalogger/__bin__
     ./casalogger-x86_64.AppImage --appimage-extract
     rm casalogger-x86_64.AppImage
     find squashfs-root -type d | xargs chmod 775
@@ -51,7 +51,7 @@ IncludeCmd: no
     sed -i -e 's/casalogger-x86_64.AppImage/squashfs-root\/AppRun/' casalogger.py
     #
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.2.4
-    cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__
+    cd /usr/local/lib/python3.10/dist-packages/casaplotms/__bin__
     ./casaplotms-x86_64.AppImage --appimage-extract
     rm casaplotms-x86_64.AppImage
     find squashfs-root -type d | xargs chmod 775
@@ -59,7 +59,7 @@ IncludeCmd: no
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py
     #
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.9.1
-    cd /usr/local/lib/python3.8/dist-packages/casaviewer/__bin__
+    cd /usr/local/lib/python3.10/dist-packages/casaviewer/__bin__
     ./casaviewer-x86_64.AppImage --appimage-extract
     rm casaviewer-x86_64.AppImage
     find squashfs-root -type d | xargs chmod 775
@@ -76,7 +76,7 @@ IncludeCmd: no
     # Install WSCLEAN, AOFLAGGER, and CARTA
     #########################################
     #
-    apt-add-repository -y -s ppa:kernsuite/kern-8
+    apt-add-repository -y -s ppa:kernsuite/kern-9
     apt-add-repository -y ppa:cartavis-team/carta
     apt-get install -y wsclean aoflagger carta
     #
@@ -86,7 +86,7 @@ IncludeCmd: no
     #
     git clone https://github.com/jive-vlbi/casa-vlbi 
     cp casa-vlbi/*py /usr/local/bin 
-    cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.8/dist-packages 
+    cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.10/dist-packages 
     rm -rf casa-vlbi
     #
     #########################################
@@ -94,7 +94,7 @@ IncludeCmd: no
     #########################################
     #
     git clone https://github.com/aardk/evn-tools
-    cp -r evn-tools/python/evn_tools /usr/local/lib/python3.8/dist-packages
+    cp -r evn-tools/python/evn_tools /usr/local/lib/python3.10/dist-packages
     rm -rf evn-tools
     # pyvo 1.3 requires latest evn_tools
     /usr/local/bin/pip install pyvo==1.3
@@ -110,9 +110,9 @@ IncludeCmd: no
     #########################################
     #
     cd /usr/local
-    mkdir -p /usr/local/lib/python3.8/dist-packages
-    mv jupyter-casa/python/start_casa /usr/local/lib/python3.8/dist-packages/
+    mkdir -p /usr/local/lib/python3.10/dist-packages
+    mv jupyter-casa/python/start_casa /usr/local/lib/python3.10/dist-packages/
     cp -r jupyter-casa/jupyter /usr/local/share/
     # Modified casa tasks for Jupyter
     cd /usr/local
-    patch lib/python3.8/dist-packages/casatasks/private/task_setjy.py jupyter-casa/python/casa/task_setjy.patch
+    patch lib/python3.10/dist-packages/casatasks/private/task_setjy.py jupyter-casa/python/casa/task_setjy.patch

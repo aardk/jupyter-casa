@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 CMD ["jupyter", "notebook"]
 RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ focal multiverse" >> /etc/apt/sources.list \
     && echo "deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates multiverse" >> /etc/apt/sources.list \
@@ -6,13 +6,11 @@ RUN echo "deb http://nl.archive.ubuntu.com/ubuntu/ focal multiverse" >> /etc/apt
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV PYTHONPATH="/usr/local/lib/python3.8/dist-packages" \
+ENV PYTHONPATH="/usr/local/lib/python3.10/dist-packages" \
     QT_X11_NO_MITSHM=1
 
 # Setup enviroment
-RUN echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse >/etc/apt/sources.list && \
-    echo deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse >>/etc/apt/sources.list && \
-    export LC_ALL=C && \
+RUN export LC_ALL=C && \
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y && \
     apt-get install -y python3 python3-dev python3-pip libgfortran5 wget software-properties-common && \
     apt-get install -y git lsof xvfb fuse curl vim nano emacs-nox&& \
@@ -36,26 +34,26 @@ RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repos
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.6.5.31 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatestutils==6.6.5.31 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotserver==1.8.2 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple almatasks==1.7.1 && \
+    #/usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple almatasks==1.7.1 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatablebrowser==0.0.35 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casafeather==0.0.22 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2024.8.26 && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.19 && \
-    cd /usr/local/lib/python3.8/dist-packages/casalogger/__bin__ && \
+    cd /usr/local/lib/python3.10/dist-packages/casalogger/__bin__ && \
     ./casalogger-x86_64.AppImage --appimage-extract && \
     rm casalogger-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casalogger-x86_64.AppImage/squashfs-root\/AppRun/' casalogger.py && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.5.2 && \
-    cd /usr/local/lib/python3.8/dist-packages/casaplotms/__bin__ && \
+    cd /usr/local/lib/python3.10/dist-packages/casaplotms/__bin__ && \
     ./casaplotms-x86_64.AppImage --appimage-extract && \
     rm casaplotms-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py && \
     /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==2.2.3 && \
-    cd /usr/local/lib/python3.8/dist-packages/casaviewer/__bin__ && \
+    cd /usr/local/lib/python3.10/dist-packages/casaviewer/__bin__ && \
     ./casaviewer-x86_64.AppImage --appimage-extract && \
     rm casaviewer-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
@@ -66,7 +64,7 @@ RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repos
 RUN pip install protobuf==3.20.*
 
 # Install WSCLEAN, AOFLAGGER
-RUN apt-add-repository -y -s ppa:kernsuite/kern-8 \
+RUN apt-add-repository -y -s ppa:kernsuite/kern-9 \
     && apt-get install -y wsclean aoflagger
 
 # Install CARTA
@@ -77,12 +75,12 @@ RUN add-apt-repository -y ppa:cartavis-team/carta \
 # Add VLBI scripts
 RUN git clone https://github.com/jive-vlbi/casa-vlbi \
     && cp casa-vlbi/*py /usr/local/bin \
-    && cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.8/dist-packages \
+    && cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.10/dist-packages \
     && rm -rf casa-vlbi
 
 # Add plotcalng; regular plotcal is removed from CASA6
 RUN git clone https://github.com/aardk/evn-tools \
-    && cp -r evn-tools/python/evn_tools /usr/local/lib/python3.8/dist-packages/ \
+    && cp -r evn-tools/python/evn_tools /usr/local/lib/python3.10/dist-packages/ \
     && rm -rf evn-tools \
     && /usr/local/bin/pip install pyvo==1.3
 
@@ -90,8 +88,8 @@ RUN git clone https://github.com/aardk/evn-tools \
 RUN pip install natsort
 
 # Install jupyter casa wrapper and copy fixed casa tasked
-RUN mkdir -p /usr/local/lib/python3.8/dist-packages
-COPY python/start_casa /usr/local/lib/python3.8/dist-packages/start_casa
+RUN mkdir -p /usr/local/lib/python3.10/dist-packages
+COPY python/start_casa /usr/local/lib/python3.10/dist-packages/start_casa
 RUN mkdir -p /opt/casa
 COPY casasiteconfig.py /opt/casa
 COPY jupyter /usr/local/share/jupyter

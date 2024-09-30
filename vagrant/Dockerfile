@@ -1,4 +1,4 @@
-from penngwyn/jupytercasa:casa-6.6
+from penngwyn/jupytercasa:latest
 CMD ["/usr/sbin/sshd", "-D"]
 USER root
 ENV DEBIAN_FRONTEND=noninteractive

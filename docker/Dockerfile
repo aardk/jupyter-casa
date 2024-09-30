@@ -81,7 +81,7 @@ RUN git clone https://github.com/jive-vlbi/casa-vlbi \
 RUN git clone https://github.com/aardk/evn-tools \
     && cp -r evn-tools/python/evn_tools /usr/local/lib/python3.10/dist-packages/ \
     && rm -rf evn-tools \
-    && /usr/local/bin/pip install pyvo==1.3
+    && /usr/local/bin/pip install 'pyvo<=1.5.99'
 
 # Add some useful python packages
 RUN pip install natsort

@@ -30,19 +30,19 @@ IncludeCmd: no
     apt-get install -y git lsof xvfb vim nano emacs-nox curl
     pip3 install -U pip
     # Nodejs
-    curl -sL https://deb.nodesource.com/setup_20.x | bash - 
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 
     apt-get install -y nodejs
     # Jupyterlab
-    /usr/local/bin/pip install matplotlib astropy notebook==7.2.2 widgetsnbextension==4.0.13 ipywidgets==8.1.5 jupyterhub==5.1.0 jupyterlab==4.2.5
+    /usr/local/bin/pip install matplotlib~=3.10.7 astropy~=6.1.7 notebook~=7.4.7 widgetsnbextension~=4.0.14 ipywidgets~=8.1.7 jupyterhub~=5.4.1 jupyterlab~=4.4.9
     #jupyter nbextension enable --py widgetsnbextension --sys-prefix
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
     # Install casa
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.5.31 casatasks==6.6.5.31 casashell==6.6.5.31 casatestutils==6.6.5.31 casaplotserver==1.8.2 casatablebrowser==0.0.35 casafeather==0.0.22 casadata==2024.8.26 #almatasks==1.7.1
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.7.0.31 casatasks==6.7.0.31 casashell==6.7.0.31 casatestutils==6.7.0.31 casaplotserver==2.0.3 casatablebrowser==0.0.39 casafeather==0.0.27 casadata==2025.8.4 casaconfig==1.4.0
     #
     # Plotms, casaviewer, and casalogger use appimage which from within singularity need 
     # root privaliges to mount due to SUID issues, as a work around we extract
     # the images and modify the casa tasks to call the extracted images
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.19
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.23
     cd /usr/local/lib/python3.10/dist-packages/casalogger/__bin__
     ./casalogger-x86_64.AppImage --appimage-extract
     rm casalogger-x86_64.AppImage
@@ -50,7 +50,7 @@ IncludeCmd: no
     cd ..
     sed -i -e 's/casalogger-x86_64.AppImage/squashfs-root\/AppRun/' casalogger.py
     #
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.2.4
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.7.4
     cd /usr/local/lib/python3.10/dist-packages/casaplotms/__bin__
     ./casaplotms-x86_64.AppImage --appimage-extract
     rm casaplotms-x86_64.AppImage
@@ -58,7 +58,7 @@ IncludeCmd: no
     cd ..
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py
     #
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==1.9.1
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==2.4.4
     cd /usr/local/lib/python3.10/dist-packages/casaviewer/__bin__
     ./casaviewer-x86_64.AppImage --appimage-extract
     rm casaviewer-x86_64.AppImage

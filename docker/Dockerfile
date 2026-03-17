@@ -15,42 +15,42 @@ RUN export LC_ALL=C && \
     pip3 install -U pip
 
 #node.js
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs
 
 # Jupyter notebook and -lab
-RUN /usr/local/bin/pip install matplotlib astropy notebook==7.2.2 widgetsnbextension==4.0.13 ipywidgets==8.1.5 jupyterhub==5.1.0 jupyterlab==4.2.5 && \
+RUN /usr/local/bin/pip install matplotlib~=3.10.7 astropy~=6.1.7 notebook~=7.4.7 widgetsnbextension~=4.0.14 ipywidgets~=8.1.7 jupyterhub~=5.4.1 jupyterlab~=4.4.9 && \
     #jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
 # Install casa
 # NB: Plotms and Casaviewer are distributed as an appimage. Appimages use FUSE, to mount a FUSE 
 # filesystem from within DOCKER requires the container to run in priviliged mode. To avoid this 
 # we extract the images and modify the casa tasks to call the extracted images
-
-RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.6.5.31 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.6.5.31 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.6.5.31 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatestutils==6.6.5.31 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotserver==1.8.2 && \
+RUN /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.7.0.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatasks==6.7.0.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casashell==6.7.0.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatestutils==6.7.0.31 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotserver==2.0.3 && \
     #/usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple almatasks==1.7.1 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatablebrowser==0.0.35 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casafeather==0.0.22 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2024.8.26 && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.19 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatablebrowser==0.0.39 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casafeather==0.0.27 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casadata==2025.8.4 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaconfig==1.4.0 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.23 && \
     cd /usr/local/lib/python3.10/dist-packages/casalogger/__bin__ && \
     ./casalogger-x86_64.AppImage --appimage-extract && \
     rm casalogger-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casalogger-x86_64.AppImage/squashfs-root\/AppRun/' casalogger.py && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.5.2 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.7.4 && \
     cd /usr/local/lib/python3.10/dist-packages/casaplotms/__bin__ && \
     ./casaplotms-x86_64.AppImage --appimage-extract && \
     rm casaplotms-x86_64.AppImage && \
     find squashfs-root -type d | xargs chmod 775 && \
     cd .. && \
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py && \
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==2.2.3 && \
+    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==2.4.4 && \
     cd /usr/local/lib/python3.10/dist-packages/casaviewer/__bin__ && \
     ./casaviewer-x86_64.AppImage --appimage-extract && \
     rm casaviewer-x86_64.AppImage && \

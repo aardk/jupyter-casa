@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: ubuntu:22.04
+From: ubuntu:24.04
 IncludeCmd: no
 
 %runscript
@@ -7,7 +7,7 @@ IncludeCmd: no
     jupyter notebook
 
 %environment
-    export PYTHONPATH="/usr/local/lib/python3.10/dist-packages" 
+    export PYTHONPATH="/usr/local/lib/python3.12/dist-packages"
     export QT_X11_NO_MITSHM=1
     unset XDG_RUNTIME_DIR 
 
@@ -21,45 +21,44 @@ IncludeCmd: no
 %post
     # Setup enviroment
     export DEBIAN_FRONTEND=noninteractive
-    #echo deb http://nl.archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse >/etc/apt/sources.list
-    #echo deb http://nl.archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse >>/etc/apt/sources.list
+    #echo deb http://nl.archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse >/etc/apt/sources.list
+    #echo deb http://nl.archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse >>/etc/apt/sources.list
 
     export LC_ALL=C
     apt-get update && apt-get install -y apt-utils debconf-utils && apt-get upgrade -y
     apt-get install -y python3 python3-dev python3-pip libgfortran5 wget software-properties-common
     apt-get install -y git lsof xvfb vim nano emacs-nox curl
-    pip3 install -U pip
     # Nodejs
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 
     apt-get install -y nodejs
     # Jupyterlab
-    /usr/local/bin/pip install matplotlib~=3.10.7 astropy~=6.1.7 notebook~=7.5.6 widgetsnbextension~=4.0.14 ipywidgets~=8.1.7 jupyterhub~=5.4.1 jupyterlab~=4.5.7
+    pip install --break-system-packages matplotlib~=3.10.7 astropy~=6.1.7 notebook~=7.5.6 widgetsnbextension~=4.0.14 ipywidgets~=8.1.7 jupyterhub~=5.4.1 jupyterlab~=4.5.7
     #jupyter nbextension enable --py widgetsnbextension --sys-prefix
     jupyter labextension install @jupyter-widgets/jupyterlab-manager
     # Install casa
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.7.0.31 casatasks==6.7.0.31 casashell==6.7.0.31 casatestutils==6.7.0.31 casaplotserver==2.0.3 casatablebrowser==0.0.39 casafeather==0.0.27 casadata==2025.8.4 casaconfig==1.4.0
+    pip install --break-system-packages --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casatools==6.7.0.31 casatasks==6.7.0.31 casashell==6.7.0.31 casatestutils==6.7.0.31 casaplotserver==2.0.3 casatablebrowser==0.0.39 casafeather==0.0.27 casadata==2025.8.4 casaconfig==1.4.0
     #
     # Plotms, casaviewer, and casalogger use appimage which from within singularity need 
     # root privaliges to mount due to SUID issues, as a work around we extract
     # the images and modify the casa tasks to call the extracted images
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.23
-    cd /usr/local/lib/python3.10/dist-packages/casalogger/__bin__
+    pip install --break-system-packages --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casalogger==1.0.23
+    cd /usr/local/lib/python3.12/dist-packages/casalogger/__bin__
     ./casalogger-x86_64.AppImage --appimage-extract
     rm casalogger-x86_64.AppImage
     find squashfs-root -type d | xargs chmod 775
     cd ..
     sed -i -e 's/casalogger-x86_64.AppImage/squashfs-root\/AppRun/' casalogger.py
     #
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.7.4
-    cd /usr/local/lib/python3.10/dist-packages/casaplotms/__bin__
+    pip install --break-system-packages --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaplotms==2.7.4
+    cd /usr/local/lib/python3.12/dist-packages/casaplotms/__bin__
     ./casaplotms-x86_64.AppImage --appimage-extract
     rm casaplotms-x86_64.AppImage
     find squashfs-root -type d | xargs chmod 775
     cd ..
     sed -i -e 's/casaplotms-x86_64.AppImage/squashfs-root\/AppRun/' private/plotmstool.py
     #
-    /usr/local/bin/pip install --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==2.4.4
-    cd /usr/local/lib/python3.10/dist-packages/casaviewer/__bin__
+    pip install --break-system-packages --extra-index-url https://casa-pip.nrao.edu/repository/pypi-casa-release/simple casaviewer==2.4.4
+    cd /usr/local/lib/python3.12/dist-packages/casaviewer/__bin__
     ./casaviewer-x86_64.AppImage --appimage-extract
     rm casaviewer-x86_64.AppImage
     find squashfs-root -type d | xargs chmod 775
@@ -70,15 +69,14 @@ IncludeCmd: no
     # Most recent protobuf breaks plotms
     #########################################
     #
-    pip install protobuf==3.20.*
+    pip install --break-system-packages protobuf==3.20.*
     #
     #########################################
     # Install WSCLEAN, AOFLAGGER, and CARTA
     #########################################
     #
-    apt-add-repository -y -s ppa:kernsuite/kern-9
-    apt-add-repository -y ppa:cartavis-team/carta
-    apt-get install -y wsclean aoflagger carta
+    apt-add-repository -y -s ppa:kernsuite/kern-10
+    apt-get install -y wsclean aoflagger
     #
     #########################################
     # JIVE VLBI Tools
@@ -86,7 +84,7 @@ IncludeCmd: no
     #
     git clone https://github.com/jive-vlbi/casa-vlbi 
     cp casa-vlbi/*py /usr/local/bin 
-    cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.10/dist-packages 
+    cp -r casa-vlbi/casavlbitools /usr/local/lib/python3.12/dist-packages 
     rm -rf casa-vlbi
     #
     #########################################
@@ -94,25 +92,25 @@ IncludeCmd: no
     #########################################
     #
     git clone https://github.com/aardk/evn-tools
-    cp -r evn-tools/python/evn_tools /usr/local/lib/python3.10/dist-packages
+    cp -r evn-tools/python/evn_tools /usr/local/lib/python3.12/dist-packages
     rm -rf evn-tools
     # evn_tools requires pyvo
-    /usr/local/bin/pip install 'pyvo<=1.5.99'
+    pip install --break-system-packages 'pyvo<=1.5.99'
     #
     #########################################
     # Useful packages 
     #########################################
     #
-    /usr/local/bin/pip install natsort
+    pip install --break-system-packages natsort
     #
     #########################################
     # Jupyter-casa
     #########################################
     #
     cd /usr/local
-    mkdir -p /usr/local/lib/python3.10/dist-packages
-    mv jupyter-casa/python/start_casa /usr/local/lib/python3.10/dist-packages/
+    mkdir -p /usr/local/lib/python3.12/dist-packages
+    mv jupyter-casa/python/start_casa /usr/local/lib/python3.12/dist-packages/
     cp -r jupyter-casa/jupyter /usr/local/share/
     # Modified casa tasks for Jupyter
     cd /usr/local
-    patch lib/python3.10/dist-packages/casatasks/private/task_setjy.py jupyter-casa/python/casa/task_setjy.patch
+    patch lib/python3.12/dist-packages/casatasks/private/task_setjy.py jupyter-casa/python/casa/task_setjy.patch
